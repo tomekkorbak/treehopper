@@ -1,7 +1,7 @@
 from tqdm import tqdm
 import torch
 from torch.autograd import Variable as Var
-from utils import map_label_to_target, map_label_to_target_sentiment
+from utils import map_label_to_target_sentiment
 import torch.nn.functional as F
 
 class SentimentTrainer(object):
