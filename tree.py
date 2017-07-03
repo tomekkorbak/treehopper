@@ -49,7 +49,7 @@ class Tree(object):
         }
         sentence = {
             'words': root + [{'text': subtree.word, 'tag': subtree.gold_label-1}
-                             for subtree in self._viz_all_children.values()],
+                             for _, subtree in sorted(self._viz_all_children.items())],
             'arcs': get_arcs(self) + [root_arc]
         }
         return sentence
