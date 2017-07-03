@@ -23,21 +23,26 @@ class SSTDataset(data.Dataset):
         self.fine_grain = fine_grain
         self.model_name = model_name
 
-        self.sentences = self.read_sentences(os.path.join(path,'rev_sentence.txt')) + self.read_sentences(os.path.join(path,'sklad_sentence.txt'))
-        self.trees = self.read_trees(os.path.join(path,'rev_parents.txt'), os.path.join(path,'rev_labels.txt')) + self.read_trees(os.path.join(path,'sklad_parents.txt'), os.path.join(path,'sklad_labels.txt'))
+        skladnica_sentences = self.read_sentences(os.path.join(path, 'sklad_sentence.txt'))
+        reviews_sentences = self.read_sentences(os.path.join(path, 'rev_sentence.txt'))
+        self.sentences = skladnica_sentences + reviews_sentences
 
-        # self.labels = self.read_labels(os.path.join(path,'dlabels.txt'))
+        skladnica_trees = self.read_trees(
+            filename_parents=os.path.join(path, 'sklad_parents.txt'),
+            filename_labels=os.path.join(path, 'sklad_labels.txt'),
+            filename_tokens=os.path.join(path, 'sklad_sentence.txt'),
+            filename_relations=os.path.join(path, 'sklad_rels.txt'),
+        )
+
+        reviews_trees = self.read_trees(
+            filename_parents=os.path.join(path, 'rev_parents.txt'),
+            filename_labels=os.path.join(path, 'rev_labels.txt'),
+            filename_tokens=os.path.join(path, 'rev_sentence.txt'),
+            filename_relations=os.path.join(path, 'rev_rels.txt'),
+        )
+
+        self.trees = skladnica_trees + reviews_trees  # list concatenation
         self.labels = []
-
-        # only get pos or neg
-        # new_trees = []
-        # new_sentences = []
-        # for i in range(len(temp_trees)):
-        #     if temp_trees[i].gold_label != 1: # 0 neg, 1 neutral, 2 pos
-        #         new_trees.append(temp_trees[i])
-        #         new_sentences.append(temp_sentences[i])
-        # self.trees = new_trees
-        # self.sentences = new_sentences
 
         for i in range(0, len(self.trees)):
             self.labels.append(self.trees[i].gold_label)
@@ -65,55 +70,43 @@ class SSTDataset(data.Dataset):
         indices = self.vocab.convertToIdx(line.split(), constants.UNK_WORD)
         return torch.LongTensor(indices)
 
-    def read_trees(self, filename_parents, filename_labels):
-        pfile = open(filename_parents, 'r', encoding='utf-8') # parent node
-        lfile = open(filename_labels, 'r', encoding='utf-8') # label node
-        p = pfile.readlines()
-        l = lfile.readlines()
-        pl = zip(p, l) # (parent, label) tuple
-        trees = [self.read_tree(p_line, l_line) for p_line, l_line in tqdm(pl)]
+    def read_trees(self, filename_parents, filename_labels, filename_tokens, filename_relations):
+        parents_file = open(filename_parents, 'r', encoding='utf-8') # parent node
+        labels_file = open(filename_labels, 'r', encoding='utf-8') # label of a node
+        tokens_file = open(filename_tokens, 'r', encoding='utf-8')
+        relations_file = open(filename_relations, 'r', encoding='utf-8')
+        iterator = zip(parents_file.readlines(), labels_file.readlines(),
+                       tokens_file.readlines(), relations_file.readlines())
+        trees = [self.read_tree(parents, labels, tokens, relations)
+                 for parents, labels, tokens, relations in tqdm(iterator)]
 
         return trees
 
-    def parse_dlabel_token(self, x):
-        if x == '#':
-            return None
-        else:
-            if self.fine_grain: # -2 -1 0 1 2 => 0 1 2 3 4
-                return int(x)+2
-            else: # # -2 -1 0 1 2 => 0 1 2
-                tmp = int(x)
-                if tmp < 0:
-                    return 0
-                elif tmp == 0:
-                    return 1
-                elif tmp >0 :
-                    return 2
+    def parse_label(self, label):
+        return int(label) + 1
 
-    def read_tree(self, line, label_line):
-        # FIXED: tree.idx, also tree dict() use base 1 as it was in dataset
-        # parents is list base 0, keep idx-1
-        # labels is list base 0, keep idx-1
-        parents = list(map(int,line.split())) # split each number and turn to int
-        trees = dict() # this is dict
+    def read_tree(self, line_parents, line_label, line_words, line_relations):
+        parents = list(map(int, line_parents.split()))
+        labels = list(map(self.parse_label, line_label.split()))
+        words = line_words.split()
+        relations = line_relations.split()
+        trees = dict()
         root = None
-        labels = list(map(self.parse_dlabel_token, label_line.split()))
-        for i in range(1,len(parents)+1):
-            #if not trees[i-1] and parents[i-1]!=-1:
-            if i not in trees.keys() and parents[i-1]!=-1:
+
+        for i in range(1, len(parents)+1):
+            if i not in trees.keys():
                 idx = i
                 prev = None
                 while True:
                     parent = parents[idx-1]
-                    if parent == -1:
-                        break
                     tree = Tree()
                     if prev is not None:
                         tree.add_child(prev)
                     trees[idx] = tree
-                    tree.idx = idx # -1 remove -1 here to prevent embs[tree.idx -1] = -1 while tree.idx = 0
-                    tree.gold_label = labels[idx-1] # add node label
-                    #if trees[parent-1] is not None:
+                    tree.idx = idx
+                    tree.gold_label = labels[idx-1]
+                    tree.word = words[idx-1]
+                    tree.relation = relations[idx-1]
                     if parent in trees.keys():
                         trees[parent].add_child(tree)
                         break
@@ -123,11 +116,9 @@ class SSTDataset(data.Dataset):
                     else:
                         prev = tree
                         idx = parent
+        # helper for visualization
+        root._viz_all_children = trees
+        root._viz_sentence = words
+        root._viz_relations = relations
+        root._viz_labels = labels
         return root
-
-    def read_labels(self, filename):
-        # Not in used
-        with open(filename,'r') as f:
-            labels = list(map(lambda x: float(x), f.readlines()))
-            labels = torch.Tensor(labels)
-        return labels
