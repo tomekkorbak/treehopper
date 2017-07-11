@@ -8,7 +8,7 @@ class SentimentTrainer(object):
     """
     For Sentiment module
     """
-    def __init__(self, args, model, embedding_model ,criterion, optimizer):
+    def __init__(self, args, model, embedding_model, criterion, optimizer):
         super(SentimentTrainer, self).__init__()
         self.args       = args
         self.model      = model
@@ -59,19 +59,23 @@ class SentimentTrainer(object):
         predictions = torch.zeros(len(dataset))
         predictions = predictions
         indices = torch.arange(0, dataset.num_classes)
+
+        output_trees = []
+
         for idx in tqdm(range(len(dataset)),desc='Testing epoch  '+str(self.epoch)+''):
             tree, sent, label = dataset[idx]
             input = Var(sent, volatile=True)
             target = Var(map_label_to_target_sentiment(label,dataset.num_classes), volatile=True)
-            if self.args.cuda:
-                input = input.cuda()
-                target = target.cuda()
+            # if self.args.cuda:
+            #     input = input.cuda()
+            #     target = target.cuda()
             emb = F.torch.unsqueeze(self.embedding_model(input),1)
-            output, _ = self.model(tree, emb) # size(1,5)
+            output, _ = self.model(tree, emb)
             err = self.criterion(output, target)
             loss += err.data[0]
             # output[:,1] = -9999 # no need middle (neutral) value
             val, pred = torch.max(output, 1)
             predictions[idx] = pred.data.cpu()[0][0]
+            output_trees.append(tree)
             # predictions[idx] = torch.dot(indices,torch.exp(output.data.cpu()))
-        return loss/len(dataset), predictions
+        return loss/len(dataset), predictions, output_trees

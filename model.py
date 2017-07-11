@@ -86,14 +86,14 @@ class ChildSumTreeLSTM(nn.Module):
         child_c, child_h = self.get_child_states(tree)
         tree.state = self.node_forward(embs[tree.idx-1], child_c, child_h)
 
-        if self.output_module != None:
-            output = self.output_module.forward(tree.state[1], training)
-            tree.output = output
-            if training and tree.gold_label != None:
-                target = Var(utils.map_label_to_target_sentiment(tree.gold_label))
-                if self.cudaFlag:
-                    target = target.cuda()
-                loss = loss + self.criterion(output, target)
+
+        output = self.output_module.forward(tree.state[1], training)
+        tree.output = output
+        if training and tree.gold_label != None:
+            target = Var(utils.map_label_to_target_sentiment(tree.gold_label))
+            if self.cudaFlag:
+                target = target.cuda()
+            loss = loss + self.criterion(output, target)
         return tree.state, loss
 
     def get_child_states(self, tree):

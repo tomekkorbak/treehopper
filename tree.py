@@ -39,8 +39,9 @@ class Tree(object):
         self._depth = count
         return self._depth
 
-    def visualize(self):
-        root = [{'text': 'root', 'tag': self.gold_label-1}]
+    def visualize(self, with_output=False):
+
+        root = [{'text': 'root', 'tag': get_label(self, with_output)}]
         root_arc = {
             'start': 0,
             'end': self.idx,
@@ -48,7 +49,7 @@ class Tree(object):
             'label': self.relation
         }
         sentence = {
-            'words': root + [{'text': subtree.word, 'tag': subtree.gold_label-1}
+            'words': root + [{'text': subtree.word, 'tag': get_label(subtree, with_output)}
                              for _, subtree in sorted(self._viz_all_children.items())],
             'arcs': get_arcs(self) + [root_arc]
         }
@@ -68,6 +69,23 @@ def get_arcs(tree, arcs_list=None):
         arcs_list.append(arc)
         get_arcs(subtree, arcs_list)
     return arcs_list
+
+def get_label(tree, with_output=False):
+    import numpy as np
+    import torch
+    if with_output:
+        if not tree.output:
+            print('no ej')
+            print(tree.children)
+            print(tree.word)
+            print(tree.gold_label)
+        output_label = torch.max(tree.output, 1)[1].data.numpy()[0][0]-1
+
+        sentiment_label = 'should {}/is {}'.format(
+            str(tree.gold_label - 1), output_label)
+    else:
+        sentiment_label = str(tree.gold_label - 1)
+    return sentiment_label
 
 
 
