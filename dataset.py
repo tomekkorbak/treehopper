@@ -100,7 +100,7 @@ class SSTDataset(data.Dataset):
                 while True:
                     parent = parents[idx-1]
                     tree = Tree()
-                    if prev is not None:
+                    if prev:
                         tree.add_child(prev)
                     trees[idx] = tree
                     tree.idx = idx

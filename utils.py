@@ -8,33 +8,33 @@ from vocab import Vocab
 # loading GLOVE word vectors
 # if .pth file is found, will load that
 # else will load from .txt file & save
-def load_word_vectors(path):
-    if os.path.isfile(path+'.pth') and os.path.isfile(path+'.vocab'):
+def load_word_vectors(embeddings_path):
+    if os.path.isfile(embeddings_path+ '.pth') and os.path.isfile(embeddings_path+ '.vocab'):
         print('==> File found, loading to memory')
-        vectors = torch.load(path+'.pth')
-        vocab = Vocab(filename=path+'.vocab')
+        vectors = torch.load(embeddings_path + '.pth')
+        vocab = Vocab(filename=embeddings_path + '.vocab')
         return vocab, vectors
     # saved file not found, read from txt file
     # and create tensors for word vectors
     print('==> File not found, preparing, be patient')
-    count = sum(1 for line in open(path+'.txt'))
-    with open(path+'.txt','r') as f:
+    count = sum(1 for line in open(embeddings_path + '.txt'))
+    with open(embeddings_path+ '.txt', 'r') as f:
         contents = f.readline().rstrip('\n').split(' ')
         dim = len(contents[1:])
     words = [None]*(count)
     vectors = torch.zeros(count,dim)
-    with open(path+'.txt','r') as f:
+    with open(embeddings_path+ '.txt', 'r') as f:
         idx = 0
         for line in f:
             contents = line.rstrip('\n').split(' ')
             words[idx] = contents[0]
-            vectors[idx] = torch.Tensor(map(float, contents[1:]))
+            vectors[idx] = torch.Tensor([float(x) for x in contents[1:]])
             idx += 1
-    with open(path+'.vocab','w') as f:
+    with open(embeddings_path+ '.vocab', 'w') as f:
         for word in words:
             f.write(word+'\n')
-    vocab = Vocab(filename=path+'.vocab')
-    torch.save(vectors, path+'.pth')
+    vocab = Vocab(filename=embeddings_path + '.vocab')
+    torch.save(vectors, embeddings_path + '.pth')
     return vocab, vectors
 
 

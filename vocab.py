@@ -8,21 +8,16 @@ class Vocab(object):
         # Special entries will not be pruned.
         self.special = []
 
-        if data is not None:
-            self.addSpecials(data)
-        if filename  is not None:
-            self.loadFile(filename)
+        if data: self.addSpecials(data)
+        if filename: self.loadFile(filename)
 
     def size(self):
         return len(self.idxToLabel)
 
     # Load entries from a file.
     def loadFile(self, filename):
-        idx = 0
         for line in open(filename, encoding='utf-8'):
-            token = line.rstrip('\n')
-            self.add(token)
-            idx += 1
+            self.add(line.rstrip('\n'))
 
     def getIndex(self, key, default=None):
         if self.lower:
@@ -80,10 +75,8 @@ class Vocab(object):
     # Convert `idx` to labels. If index `stop` is reached, convert it and return.
     def convertToLabels(self, idx, stop):
         labels = []
-
         for i in idx:
             labels += [self.getLabel(i)]
             if i == stop:
                 break
-
         return labels
