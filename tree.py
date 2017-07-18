@@ -1,3 +1,6 @@
+import torch
+
+
 class Tree(object):
     def __init__(self):
         self.parent = None
@@ -55,6 +58,22 @@ class Tree(object):
         }
         return sentence
 
+    def compute_accuracy(self):
+
+        def _compute_accuracy(tree, accuracies=None):
+            """
+            Recursively compute accuracies for every subtree
+            """
+            if accuracies is None:
+                accuracies = []
+            accuracies.append(1 if torch.max(tree.output, 1)[1].data.numpy()[0][0] == tree.gold_label else 0)
+            for subtree in tree.children:
+                _compute_accuracy(subtree, accuracies)
+            return accuracies
+
+        total_accuracies = _compute_accuracy(self)
+        return np.mean(total_accuracies)
+
 
 def get_arcs(tree, arcs_list=None):
     if arcs_list is None:
@@ -75,7 +94,6 @@ def get_label(tree, with_output=False):
     import torch
     if with_output:
         if not tree.output:
-            print('no ej')
             print(tree.children)
             print(tree.word)
             print(tree.gold_label)

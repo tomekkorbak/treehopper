@@ -16,7 +16,7 @@ from trainer import SentimentTrainer
 def main():
     global args
     args = parse_args(type=1)
-    args.input_dim = 200
+    args.input_dim = 300
     args.mem_dim = 168
     args.num_classes = 3  # -1 0 1
     args.cuda = args.cuda and torch.cuda.is_available()
@@ -134,7 +134,7 @@ def main():
         emb = emb.cuda()
 
     # model.childsumtreelstm.emb.state_dict()['weight'].copy_(emb)
-    embedding_model.state_dict()['weight'].copy_(emb)
+    # embedding_model.state_dict()['weight'].copy_(emb)
 
     # create trainer object for training and testing
     trainer     = SentimentTrainer(args, model, embedding_model ,criterion, optimizer)
@@ -144,15 +144,15 @@ def main():
     filename = args.name + '.pth'
     for epoch in range(args.epochs):
         train_loss = trainer.train(train_dataset)
-        dev_loss, dev_pred = trainer.test(dev_dataset)
-        dev_acc = metrics.sentiment_accuracy_score(dev_pred, dev_dataset.labels)
+        dev_loss, dev_acc, _ = trainer.test(dev_dataset)
+        dev_acc = torch.mean(dev_acc)
         print('==> Train loss   : %f \t' % train_loss, end="")
         print('Epoch ', epoch, 'dev percentage ', dev_acc)
         torch.save(model, args.saved + str(epoch) + '_model_' + filename)
         torch.save(embedding_model, args.saved + str(epoch) + '_embedding_' + filename)
-        if dev_acc > max_dev:
-            max_dev = dev_acc
-            max_dev_epoch = epoch
+        # if dev_acc > max_dev:
+        #     max_dev = dev_acc
+        #     max_dev_epoch = epoch
         gc.collect()
     print('epoch ' + str(max_dev_epoch) + ' dev score of ' + str(max_dev))
     print('eva on test set ')
