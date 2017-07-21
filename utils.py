@@ -1,9 +1,14 @@
 from __future__ import print_function
 
 import os, math
+import pickle
+import gensim
 import torch
+from gensim.models import KeyedVectors
+
 from tree import Tree
 from vocab import Vocab
+
 
 # loading GLOVE word vectors
 # if .pth file is found, will load that
@@ -16,26 +21,13 @@ def load_word_vectors(embeddings_path):
         return vocab, vectors
     # saved file not found, read from txt file
     # and create tensors for word vectors
-    print('==> File not found, preparing, be patient')
-    count = sum(1 for line in open(embeddings_path + '.txt'))
-    with open(embeddings_path+ '.txt', 'r') as f:
-        contents = f.readline().rstrip('\n').split(' ')
-        dim = len(contents[1:])
-    words = [None]*(count)
-    vectors = torch.zeros(count,dim)
-    with open(embeddings_path+ '.txt', 'r') as f:
-        idx = 0
-        for line in f:
-            contents = line.rstrip('\n').split(' ')
-            words[idx] = contents[0]
-            vectors[idx] = torch.Tensor([float(x) for x in contents[1:]])
-            idx += 1
-    with open(embeddings_path+ '.vocab', 'w') as f:
-        for word in words:
-            f.write(word+'\n')
+    if os.path.isfile(embeddings_path+ '.model'):
+        load_from_gensim_model(embeddings_path)
+    vectors = load_from_txt(embeddings_path)
     vocab = Vocab(filename=embeddings_path + '.vocab')
     torch.save(vectors, embeddings_path + '.pth')
     return vocab, vectors
+
 
 
 # write unique words from a set of files to a new file
@@ -69,3 +61,31 @@ def count_param(model):
     # sum_param-= emb_sum
     print ('sum', sum_param)
     print('____________')
+
+def load_from_txt(embeddings_path):
+    print('==> File not found, preparing, be patient')
+    count = sum(1 for line in open(embeddings_path + '.txt'))
+    with open(embeddings_path+ '.txt', 'r') as f:
+        contents = f.readline().rstrip('\n').split(' ')
+        dim = len(contents[1:])
+    words = [None]*(count)
+    vectors = torch.zeros(count,dim)
+    with open(embeddings_path+ '.txt', 'r') as f:
+        idx = 0
+        for line in f:
+            contents = line.rstrip('\n').split(' ')
+            words[idx] = contents[0]
+            vectors[idx] = torch.Tensor([float(x) for x in contents[1:]])
+            idx += 1
+    with open(embeddings_path+ '.vocab', 'w') as f:
+        for word in words:
+            f.write(word+'\n')
+    return vectors
+
+def load_from_gensim_model(embeddings_path):
+    model = KeyedVectors.load(embeddings_path+".model")
+    model.wv.save_word2vec_format(embeddings_path+".txt", binary=False)
+    with open(embeddings_path+ '.txt', 'r') as f:
+        contents = f.read().split('\n')
+    with open(embeddings_path+ '.txt', 'w') as f:
+        f.write("\n".join(contents[1:]))

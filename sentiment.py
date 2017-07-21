@@ -3,10 +3,11 @@ from __future__ import print_function
 import os
 import numpy as np
 from sklearn.model_selection import KFold
+import re
 
 from model import *
 from split_datasets import split_dataset_simple, split_dataset_random, split_dataset_kfold
-from trainer import train
+from training import train
 from vocab import Vocab
 from dataset import SSTDataset
 from utils import build_vocab
@@ -15,8 +16,9 @@ from config import parse_args
 
 def set_arguments():
     args = parse_args(type=1)
-    args.input_dim = 25
     args.mem_dim = 168
+    args.embedding_file = 'w2v_allwiki_nkjp300_50'
+    args.input_dim = int(re.search("((\d+)d$)|((\d+)$)",args.embedding_file).group(0))
     args.num_classes = 3  # -1 0 1
     args.cuda = args.cuda and torch.cuda.is_available()
     args.split = ("kfold",10) #("simple",size_of_train),("random",size_of_dev),("kfold", number_of_folds)
@@ -58,9 +60,13 @@ def kfold_training(dataset,vocab, split, train_dataset, dev_dataset,args):
     X = np.array([(x, y) for x, y in zip(dataset.trees, dataset.sentences)])
     y = np.array(dataset.labels)
     max_dev_epoch, max_dev = [], []
+    a = 0
     for train_index, test_index in kf.split(X):
         train_dataset, dev_dataset = split_dataset_kfold(X, y, train_index, test_index, train_dataset, dev_dataset)
         dev_epoch, dev = train(train_dataset, dev_dataset, vocab,args)
+        with open("results.csv", "a") as myfile:
+            myfile.write(str(a)+"\t"+str(args.input_dim) + "," + args.split[0] + "," + str(max_dev_epoch) + "," + str(max_dev) + "\n")
+        a+=1
         max_dev_epoch.append(dev_epoch), max_dev.append(dev)
     return max_dev_epoch, max_dev
 

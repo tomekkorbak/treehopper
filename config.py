@@ -5,7 +5,7 @@ def parse_args(type=0):
         parser = argparse.ArgumentParser(description='PyTorch TreeLSTM for Sentence Similarity on Dependency Trees')
         parser.add_argument('--data', default='data/sick/',
                             help='path to dataset')
-        parser.add_argument('--glove', default='data/glove/',
+        parser.add_argument('--glove', default='data/pol/',
                             help='directory with GLOVE embeddings')
         parser.add_argument('--batchsize', default=25, type=int,
                             help='batchsize for optimizer updates')
@@ -30,14 +30,14 @@ def parse_args(type=0):
         parser = argparse.ArgumentParser(description='PyTorch TreeLSTM for Sentiment Analysis Trees')
         parser.add_argument('--name', default='default_name',
                             help='name for log and saved models')
-        parser.add_argument('--saved', default='saved_model',
+        parser.add_argument('--saved', default='models/saved_model',
                             help='name for log and saved models')
 
         parser.add_argument('--model_name', default='constituency',
                             help='model name constituency or dependency')
         parser.add_argument('--data', default='training-treebank',
                             help='path to dataset')
-        parser.add_argument('--glove', default='data/glove/',
+        parser.add_argument('--glove', default='data/pol/',
                             help='directory with GLOVE embeddings')
         parser.add_argument('--batchsize', default=25, type=int,
                             help='batchsize for optimizer updates')

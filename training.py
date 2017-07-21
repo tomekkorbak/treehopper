@@ -32,16 +32,18 @@ def load_embedding_model(args,vocab):
         emb = torch.load(emb_file)
     else:
         # load glove embeddings and vocab
-        glove_vocab, glove_emb = load_word_vectors(os.path.join(args.glove,'glove.twitter.27B.25d'))
+        # args.glove = "data/glove"
+        # glove_vocab, glove_emb = load_word_vectors(os.path.join(args.glove,'glove.twitter.27B.25d'))
+        glove_vocab, glove_emb = load_word_vectors(os.path.join(args.glove,args.embedding_file))
         print('==> GLOVE vocabulary size: %d ' % glove_vocab.size())
 
         emb = torch.zeros(vocab.size(),glove_emb.size(1))
 
-        for word in vocab.labelToIdx.keys():
-            if glove_vocab.getIndex(word):
-                emb[vocab.getIndex(word)] = glove_emb[glove_vocab.getIndex(word)]
+        for word in vocab.label_to_idx.keys():
+            if glove_vocab.get_index(word):
+                emb[vocab.get_index(word)] = glove_emb[glove_vocab.get_index(word)]
             else:
-                emb[vocab.getIndex(word)] = torch.Tensor(emb[vocab.getIndex(word)].size()).normal_(-0.05,0.05)
+                emb[vocab.get_index(word)] = torch.Tensor(emb[vocab.get_index(word)].size()).normal_(-0.05, 0.05)
         torch.save(emb, emb_file)
 
     # plug these into embedding matrix inside model
