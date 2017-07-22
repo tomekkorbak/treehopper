@@ -75,7 +75,6 @@ def train(train_dataset, dev_dataset,vocab,args):
 
     embedding_model = load_embedding_model(args,vocab)
 
-
     # create trainer object for training and testing
     trainer = SentimentTrainer(args, model, embedding_model ,criterion, optimizer)
 
@@ -90,19 +89,11 @@ def train(train_dataset, dev_dataset,vocab,args):
         print('Epoch ', epoch, 'dev percentage ', dev_acc)
         torch.save(model, args.saved + str(epoch) + '_model_' + filename)
         torch.save(embedding_model, args.saved + str(epoch) + '_embedding_' + filename)
-        # if dev_acc > max_dev:
-        #     max_dev = dev_acc
-        #     max_dev_epoch = epoch
+        if dev_acc > max_dev:
+            max_dev = dev_acc
+            max_dev_epoch = epoch
         gc.collect()
     print('epoch ' + str(max_dev_epoch) + ' dev score of ' + str(max_dev))
-    print('eva on test set ')
-    model = torch.load(args.saved + str(max_dev_epoch) + '_model_' + filename)
-    embedding_model = torch.load(args.saved + str(max_dev_epoch) + '_embedding_' + filename)
-    trainer = SentimentTrainer(args, model, embedding_model, criterion, optimizer)
-    print('Epoch with max dev:' + str(max_dev_epoch) + ' |test percentage ' + str(max_dev))
-    print('____________________' + str(args.name) + '___________________')
-    # test_loss, test_pred = trainer.test(test_dataset)
-    # test_acc = metrics.sentiment_accuracy_score(test_pred, test_dataset.labels)
 
     return max_dev_epoch, max_dev
 

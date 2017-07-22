@@ -55,6 +55,7 @@ def main():
     with open("results.csv", "a") as myfile:
         myfile.write(str(args.input_dim)+","+args.split[0]+","+ str(max_dev_epoch)+","+str(max_dev)+"\n")
 
+
 def kfold_training(dataset,vocab, split, train_dataset, dev_dataset,args):
     kf = KFold(n_splits=split)
     X = np.array([(x, y) for x, y in zip(dataset.trees, dataset.sentences)])
