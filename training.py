@@ -84,15 +84,15 @@ def train(train_dataset, dev_dataset,vocab,args):
     filename = args.name + '.pth'
     for epoch in range(args.epochs):
         train_loss = trainer.train(train_dataset)
-        dev_loss, dev_pred, output_trees = trainer.test(dev_dataset)
-        dev_acc = metrics.sentiment_accuracy_score(dev_pred, dev_dataset.labels)
+        dev_loss, dev_acc, _ = trainer.test(dev_dataset)
+        dev_acc = torch.mean(dev_acc)
         print('==> Train loss   : %f \t' % train_loss, end="")
         print('Epoch ', epoch, 'dev percentage ', dev_acc)
         torch.save(model, args.saved + str(epoch) + '_model_' + filename)
         torch.save(embedding_model, args.saved + str(epoch) + '_embedding_' + filename)
-        if dev_acc > max_dev:
-            max_dev = dev_acc
-            max_dev_epoch = epoch
+        # if dev_acc > max_dev:
+        #     max_dev = dev_acc
+        #     max_dev_epoch = epoch
         gc.collect()
     print('epoch ' + str(max_dev_epoch) + ' dev score of ' + str(max_dev))
     print('eva on test set ')

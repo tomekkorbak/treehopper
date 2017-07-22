@@ -1,3 +1,4 @@
+import numpy as np
 import torch
 
 class Tree(object):
@@ -17,6 +18,7 @@ class Tree(object):
     def add_child(self,child):
         child.parent = self
         self.children.append(child)
+        self.num_children += 1
 
     def size(self):
         if getattr(self,'_size'):
@@ -57,6 +59,22 @@ class Tree(object):
             'arcs': get_arcs(self) + [root_arc]
         }
         return sentence
+
+    def compute_accuracy(self):
+
+        def _compute_accuracy(tree, accuracies=None):
+            """
+            Recursively compute accuracies for every subtree
+            """
+            if accuracies is None:
+                accuracies = []
+            accuracies.append(1 if torch.max(tree.output, 1)[1].data.numpy()[0][0] == tree.gold_label else 0)
+            for subtree in tree.children:
+                _compute_accuracy(subtree, accuracies)
+            return accuracies
+
+        total_accuracies = _compute_accuracy(self)
+        return np.mean(total_accuracies)
 
 
 def get_arcs(tree, arcs_list=None):

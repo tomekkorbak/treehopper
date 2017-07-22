@@ -146,4 +146,5 @@ class TreeLSTMSentiment(nn.Module):
     def forward(self, tree, inputs, training = False):
         tree_state, loss = self.tree_module(tree, inputs, training)
         output = tree.output
-        return output, loss
+        acc = tree.compute_accuracy()
+        return output, loss, acc
