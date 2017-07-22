@@ -17,7 +17,7 @@ from config import parse_args
 def set_arguments():
     args = parse_args(type=1)
     args.mem_dim = 168
-    args.embedding_file = 'w2v_allwiki_nkjp300_50'
+    args.embedding_file = 'w2v_allwiki_nkjpfull_300'
     args.input_dim = int(re.search("((\d+)d$)|((\d+)$)",args.embedding_file).group(0))
     args.num_classes = 3  # -1 0 1
     args.cuda = args.cuda and torch.cuda.is_available()

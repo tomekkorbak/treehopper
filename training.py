@@ -27,7 +27,7 @@ def load_embedding_model(args,vocab):
         embedding_model = embedding_model.cuda()
     # for words common to dataset vocab and GLOVE, use GLOVE vectors
     # for other words in dataset vocab, use random normal vectors
-    emb_file = os.path.join(args.data, 'sst_embed.pth')
+    emb_file = os.path.join(args.data, 'embeddingi.pth')
     if os.path.isfile(emb_file):
         emb = torch.load(emb_file)
     else:
@@ -37,7 +37,7 @@ def load_embedding_model(args,vocab):
         glove_vocab, glove_emb = load_word_vectors(os.path.join(args.glove,args.embedding_file))
         print('==> GLOVE vocabulary size: %d ' % glove_vocab.size())
 
-        emb = torch.zeros(vocab.size(),glove_emb.size(1))
+        emb = torch.zeros(vocab.size(), glove_emb.size(1))
 
         for word in vocab.label_to_idx.keys():
             if glove_vocab.get_index(word):
@@ -50,7 +50,6 @@ def load_embedding_model(args,vocab):
     if args.cuda:
         emb = emb.cuda()
 
-    # model.childsumtreelstm.emb.state_dict()['weight'].copy_(emb)
     embedding_model.state_dict()['weight'].copy_(emb)
     return embedding_model
 
@@ -74,13 +73,11 @@ def train(train_dataset, dev_dataset,vocab,args):
 
     metrics = Metrics(args.num_classes)
 
-    utils.count_param(model)
-
     embedding_model = load_embedding_model(args,vocab)
 
 
     # create trainer object for training and testing
-    trainer     = SentimentTrainer(args, model, embedding_model ,criterion, optimizer)
+    trainer = SentimentTrainer(args, model, embedding_model ,criterion, optimizer)
 
     max_dev = 0
     max_dev_epoch = 0
