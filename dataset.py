@@ -67,7 +67,7 @@ class SSTDataset(data.Dataset):
         return sentences
 
     def read_sentence(self, line):
-        indices = self.vocab.convertToIdx(line.split(), constants.UNK_WORD)
+        indices = self.vocab.convert_to_idx(line.split(), constants.UNK_WORD)
         return torch.LongTensor(indices)
 
     def read_trees(self, filename_parents, filename_labels, filename_tokens, filename_relations):
@@ -100,7 +100,7 @@ class SSTDataset(data.Dataset):
                 while True:
                     parent = parents[idx-1]
                     tree = Tree()
-                    if prev is not None:
+                    if prev:
                         tree.add_child(prev)
                     trees[idx] = tree
                     tree.idx = idx
