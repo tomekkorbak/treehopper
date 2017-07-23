@@ -1,6 +1,3 @@
-from __future__ import print_function
-
-import os
 import numpy as np
 from sklearn.model_selection import KFold
 import re
@@ -15,8 +12,8 @@ from config import parse_args
 
 
 def set_arguments():
-    args = parse_args(type=1)
-    args.mem_dim = 168
+    args = parse_args()
+    args.mem_dim = 300
     args.embedding_file = 'w2v_allwiki_nkjpfull_300'
     args.input_dim = int(re.search("((\d+)d$)|((\d+)$)",args.embedding_file).group(0))
     args.num_classes = 3  # -1 0 1
@@ -30,7 +27,6 @@ def main():
     args = set_arguments()
 
     train_dir = 'training-treebank'
-    token_files = os.path.join(train_dir, 'sents.toks')
     vocab_file = 'vocab.txt'
     build_vocab([
         'training-treebank/rev_sentence.txt',

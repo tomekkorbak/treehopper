@@ -5,7 +5,6 @@ import torch.optim as optim
 import gc
 
 from model import *
-from metrics import Metrics
 from utils import load_word_vectors
 from sentiment_trainer import SentimentTrainer
 
@@ -72,8 +71,6 @@ def train(train_dataset, dev_dataset,vocab,args):
         criterion.cuda()
 
     optimizer = choose_optimizer(args,model)
-
-    metrics = Metrics(args.num_classes)
 
     embedding_model = load_embedding_model(args,vocab)
 
