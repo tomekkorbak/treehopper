@@ -60,10 +60,12 @@ def train(train_dataset, dev_dataset,vocab,args):
     # initialize model, criterion/loss_function, optimizer
 
     model = TreeLSTMSentiment(
-                args.cuda, vocab.size(),
-                args.input_dim, args.mem_dim,
-                args.num_classes, args.model_name, criterion
-            )
+        cuda=args.cuda,
+        in_dim=args.input_dim,
+        mem_dim=args.mem_dim,
+        num_classes=args.num_classes,
+        criterion=criterion
+    )
 
     if args.cuda:
         model.cuda()
