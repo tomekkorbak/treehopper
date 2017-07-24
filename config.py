@@ -12,7 +12,7 @@ def parse_args():
                             help='model name constituency or dependency')
         parser.add_argument('--data', default='training-treebank',
                             help='path to dataset')
-        parser.add_argument('--glove', default='data/pol/',
+        parser.add_argument('--glove', default='data/fasttext/',
                             help='directory with GLOVE embeddings')
         parser.add_argument('--batchsize', default=25, type=int,
                             help='batchsize for optimizer updates')

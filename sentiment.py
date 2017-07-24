@@ -11,11 +11,12 @@ from utils import build_vocab
 from config import parse_args
 
 
-def set_arguments():
+def set_arguments(grid_args):
     args = parse_args()
     args.mem_dim = 300
-    args.embedding_file = 'w2v_allwiki_nkjpfull_300'
-    args.input_dim = int(re.search("((\d+)d$)|((\d+)$)",args.embedding_file).group(0))
+    args.embedding_file = 'wiki.pl'
+    dim_from_file =re.search("((\d+)d$)|((\d+)$)",args.embedding_file)
+    args.input_dim = int(dim_from_file.group(0)) if dim_from_file else 300
     args.num_classes = 3  # -1 0 1
     args.cuda = args.cuda and torch.cuda.is_available()
     args.split = ("kfold",10) #("simple",size_of_train),("random",size_of_dev),("kfold", number_of_folds)
@@ -23,8 +24,8 @@ def set_arguments():
     return args
 
 
-def main():
-    args = set_arguments()
+def main(grid_args = None):
+    args = set_arguments(grid_args)
 
     train_dir = 'training-treebank'
     vocab_file = 'vocab.txt'
@@ -57,13 +58,9 @@ def kfold_training(dataset,vocab, split, train_dataset, dev_dataset,args):
     X = np.array([(x, y) for x, y in zip(dataset.trees, dataset.sentences)])
     y = np.array(dataset.labels)
     max_dev_epoch, max_dev = [], []
-    a = 0
     for train_index, test_index in kf.split(X):
         train_dataset, dev_dataset = split_dataset_kfold(X, y, train_index, test_index, train_dataset, dev_dataset)
         dev_epoch, dev = train(train_dataset, dev_dataset, vocab,args)
-        with open("results.csv", "a") as myfile:
-            myfile.write(str(a)+"\t"+str(args.input_dim) + "," + args.split[0] + "," + str(max_dev_epoch) + "," + str(max_dev) + "\n")
-        a+=1
         max_dev_epoch.append(dev_epoch), max_dev.append(dev)
     return max_dev_epoch, max_dev
 

@@ -1,8 +1,10 @@
 import os
 import torch
 from gensim.models import KeyedVectors
+from gensim.models.wrappers import FastText
 
 from vocab import Vocab
+
 
 
 def load_word_vectors(embeddings_path):
@@ -11,8 +13,10 @@ def load_word_vectors(embeddings_path):
         vectors = torch.load(embeddings_path + '.pth')
         vocab = Vocab(filename=embeddings_path + '.vocab')
         return vocab, vectors
-
-    model = KeyedVectors.load(embeddings_path + ".model")
+    if os.path.isfile(embeddings_path+ '.model'):
+        model = KeyedVectors.load(embeddings_path + ".model")
+    if os.path.isfile(embeddings_path + '.vec'):
+        model = FastText.load_fasttext_format(embeddings_path).wv
     list_of_tokens = model.vocab.keys()
     vectors = torch.zeros(len(list_of_tokens), model.vector_size)
     with open(embeddings_path + '.vocab', 'w', encoding='utf-8') as f:
