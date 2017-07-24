@@ -7,13 +7,14 @@ def parse_args():
                             help='name for log and saved models')
         parser.add_argument('--saved', default='models/saved_model',
                             help='name for log and saved models')
-
         parser.add_argument('--model_name', default='constituency',
                             help='model name constituency or dependency')
         parser.add_argument('--data', default='training-treebank',
                             help='path to dataset')
-        parser.add_argument('--glove', default='data/fasttext/',
-                            help='directory with GLOVE embeddings')
+        parser.add_argument('--emb_dir', default='data/pol/fasttext',
+                            help='directory with embeddings')
+        parser.add_argument('--emb_file', default='wiki.pl',
+                            help='file with embeddings')
         parser.add_argument('--batchsize', default=25, type=int,
                             help='batchsize for optimizer updates')
         parser.add_argument('--epochs', default=15, type=int,

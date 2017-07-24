@@ -13,18 +13,24 @@ from config import parse_args
 
 def set_arguments(grid_args):
     args = parse_args()
+    if "embeddings" in grid_args :
+        args.emb_dir = grid_args["embeddings"][0]
+        args.emb_file = grid_args["embeddings"][1]
+    if "optim" in grid_args:
+        args.optim = grid_args["optim"]
+    if "wd" in grid_args:
+        args.wd = grid_args["wd"]
     args.mem_dim = 300
-    args.embedding_file = 'wiki.pl'
-    dim_from_file =re.search("((\d+)d$)|((\d+)$)",args.embedding_file)
+    dim_from_file =re.search("((\d+)d$)|((\d+)$)", args.emb_file)
     args.input_dim = int(dim_from_file.group(0)) if dim_from_file else 300
     args.num_classes = 3  # -1 0 1
     args.cuda = args.cuda and torch.cuda.is_available()
-    args.split = ("kfold",10) #("simple",size_of_train),("random",size_of_dev),("kfold", number_of_folds)
+    args.split = ("simple",0.9) #("simple",size_of_train),("random",size_of_dev),("kfold", number_of_folds)
     print(args)
     return args
 
 
-def main(grid_args = None):
+def main(grid_args = {}):
     args = set_arguments(grid_args)
 
     train_dir = 'training-treebank'

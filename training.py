@@ -10,6 +10,7 @@ from sentiment_trainer import SentimentTrainer
 
 
 def choose_optimizer(args, model):
+
     if args.optim =='adam':
         return optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=args.lr, weight_decay=args.wd)
     elif args.optim=='adagrad':
@@ -26,14 +27,14 @@ def load_embedding_model(args,vocab):
         embedding_model = embedding_model.cuda()
     # for words common to dataset vocab and GLOVE, use GLOVE vectors
     # for other words in dataset vocab, use random normal vectors
-    emb_file = os.path.join(args.data, 'embeddingi.pth')
-    if os.path.isfile(emb_file):
+    emb_file = os.path.join(args.data, args.emb_dir.split("/")[-1]+"_"+args.emb_file + '_emb.pth')
+    if os.path.isfile(emb_file) and torch.load(emb_file).size()[1] == args.input_dim :
         emb = torch.load(emb_file)
     else:
         # load glove embeddings and vocab
         # args.glove = "data/glove"
         # glove_vocab, glove_emb = load_word_vectors(os.path.join(args.glove,'glove.twitter.27B.25d'))
-        glove_vocab, glove_emb = load_word_vectors(os.path.join(args.glove,args.embedding_file))
+        glove_vocab, glove_emb = load_word_vectors(os.path.join(args.emb_dir,args.emb_file))
         print('==> GLOVE vocabulary size: %d ' % glove_vocab.size())
 
         emb = torch.zeros(vocab.size(), glove_emb.size(1))
