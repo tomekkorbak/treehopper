@@ -11,7 +11,7 @@ import utils
 
 # Dataset class for SICK dataset
 class SSTDataset(data.Dataset):
-    def __init__(self, path=None, vocab=None, num_classes=None, fine_grain=None, model_name=None):
+    def __init__(self, path=None, vocab=None, num_classes=None):
         super(SSTDataset, self).__init__()
 
         self.num_classes = num_classes
@@ -20,8 +20,6 @@ class SSTDataset(data.Dataset):
 
         self.vocab = vocab
         self.num_classes = num_classes
-        self.fine_grain = fine_grain
-        self.model_name = model_name
 
         skladnica_sentences = self.read_sentences(os.path.join(path, 'sklad_sentence.txt'))
         reviews_sentences = self.read_sentences(os.path.join(path, 'rev_sentence.txt'))

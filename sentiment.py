@@ -30,7 +30,7 @@ def set_arguments(grid_args):
     return args
 
 
-def main(grid_args = {}):
+def main(grid_args={}):
     args = set_arguments(grid_args)
 
     train_dir = 'training-treebank'
@@ -40,8 +40,7 @@ def main(grid_args = {}):
         'training-treebank/sklad_sentence.txt'
     ], 'vocab.txt')
     vocab = Vocab(filename=vocab_file)
-    dataset = SSTDataset(train_dir, vocab, args.num_classes,
-                               args.fine_grain, args.model_name)
+    dataset = SSTDataset(train_dir, vocab, args.num_classes)
 
     train_dataset, dev_dataset = SSTDataset(num_classes=args.num_classes), SSTDataset(num_classes=args.num_classes)
 

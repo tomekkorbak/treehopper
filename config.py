@@ -1,14 +1,13 @@
 import argparse
+from datetime import datetime
 
 
 def parse_args():
         parser = argparse.ArgumentParser(description='PyTorch TreeLSTM for Sentiment Analysis Trees')
-        parser.add_argument('--name', default='default_name',
+        parser.add_argument('--name', default='%Y%m%d_%H%M'.format(datetime.now()),
                             help='name for log and saved models')
         parser.add_argument('--saved', default='models/saved_model',
                             help='name for log and saved models')
-        parser.add_argument('--model_name', default='constituency',
-                            help='model name constituency or dependency')
         parser.add_argument('--data', default='training-treebank',
                             help='path to dataset')
         parser.add_argument('--emb_dir', default='data/pol/fasttext',
@@ -31,8 +30,6 @@ def parse_args():
                             help='optimizer (default: adagrad)')
         parser.add_argument('--seed', default=123, type=int,
                             help='random seed (default: 123)')
-        parser.add_argument('--fine_grain', default=0, type=int,
-                            help='fine grained (default 0 - binary mode)')
         parser.add_argument('--reweight', default=False, type=bool,
                             help='reweight loss per class to the distrubition '
                                  'of classess in the public dataset')

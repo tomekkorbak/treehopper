@@ -57,7 +57,7 @@ def load_embedding_model(args,vocab):
 def train(train_dataset, dev_dataset, vocab, args):
     # Optionally reweight loss per class to the distribution of classes in
     # the public dataset
-    weight = torch.Tensor([0.024, 0.820, 0.156]) if args.reweight else None
+    weight = torch.Tensor([1/0.024, 1/0.820, 1/0.156]) if args.reweight else None
     criterion = nn.NLLLoss(weight=weight)
 
     # initialize model, criterion/loss_function, optimizer
