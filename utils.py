@@ -6,17 +6,16 @@ from gensim.models.wrappers import FastText
 from vocab import Vocab
 
 
-
 def load_word_vectors(embeddings_path):
     if os.path.isfile(embeddings_path+ '.pth') and os.path.isfile(embeddings_path+ '.vocab'):
         print('==> File found, loading to memory')
         vectors = torch.load(embeddings_path + '.pth')
         vocab = Vocab(filename=embeddings_path + '.vocab')
         return vocab, vectors
-    if os.path.isfile(embeddings_path+ '.model'):
+    if os.path.isfile(embeddings_path + '.model'):
         model = KeyedVectors.load(embeddings_path + ".model")
     if os.path.isfile(embeddings_path + '.vec'):
-        model = FastText.load_fasttext_format(embeddings_path).wv
+        model = FastText.load_word2vec_format(embeddings_path + '.vec')
     list_of_tokens = model.vocab.keys()
     vectors = torch.zeros(len(list_of_tokens), model.vector_size)
     with open(embeddings_path + '.vocab', 'w', encoding='utf-8') as f:
