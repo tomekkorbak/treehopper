@@ -33,6 +33,9 @@ def parse_args():
                             help='random seed (default: 123)')
         parser.add_argument('--fine_grain', default=0, type=int,
                             help='fine grained (default 0 - binary mode)')
+        parser.add_argument('--reweight', default=False, type=bool,
+                            help='reweight loss per class to the distrubition '
+                                 'of classess in the public dataset')
 
         cuda_parser = parser.add_mutually_exclusive_group(required=False)
         cuda_parser.add_argument('--cuda', dest='cuda', action='store_true')
