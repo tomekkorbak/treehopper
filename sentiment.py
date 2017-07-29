@@ -20,6 +20,7 @@ def set_arguments(grid_args):
         args.optim = grid_args["optim"]
     if "wd" in grid_args:
         args.wd = grid_args["wd"]
+    args.calculate_new_words = True
     args.mem_dim = 300
     dim_from_file =re.search("((\d+)d$)|((\d+)$)", args.emb_file)
     args.input_dim = int(dim_from_file.group(0)) if dim_from_file else 300
