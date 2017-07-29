@@ -1,16 +1,20 @@
 import os
 from copy import deepcopy
 from tqdm import tqdm
+
+from sklearn.utils import shuffle
 import torch
 import torch.utils.data as data
+
 from tree import Tree
-from vocab import Vocab
 import constants
-import utils
 
 
-# Dataset class for SICK dataset
 class SSTDataset(data.Dataset):
+    """
+    A wrapper class for dataset in the format of Stanford Sentiment Treebank 
+    (SST) (https://nlp.stanford.edu/sentiment/)
+    """
     def __init__(self, path=None, vocab=None, num_classes=None):
         super(SSTDataset, self).__init__()
 
@@ -21,8 +25,12 @@ class SSTDataset(data.Dataset):
         self.vocab = vocab
         self.num_classes = num_classes
 
-        skladnica_sentences = self.read_sentences(os.path.join(path, 'sklad_sentence.txt'))
-        reviews_sentences = self.read_sentences(os.path.join(path, 'rev_sentence.txt'))
+        skladnica_sentences = self.read_sentences(
+            os.path.join(path, 'sklad_sentence.txt')
+        )
+        reviews_sentences = self.read_sentences(
+            os.path.join(path, 'rev_sentence.txt')
+        )
         self.sentences = skladnica_sentences + reviews_sentences
 
         skladnica_trees = self.read_trees(
@@ -47,8 +55,9 @@ class SSTDataset(data.Dataset):
         self.labels = torch.Tensor(self.labels)  # let labels be tensor
 
         # shuffle
-        from sklearn.utils import shuffle
-        self.trees, self.sentences, self.labels = shuffle(self.trees, self.sentences, self.labels)
+        self.trees, self.sentences, self.labels = shuffle(self.trees,
+                                                          self.sentences,
+                                                          self.labels)
 
     def __len__(self):
         return len(self.trees)
@@ -57,20 +66,22 @@ class SSTDataset(data.Dataset):
         tree = deepcopy(self.trees[index])
         sent = deepcopy(self.sentences[index])
         label = deepcopy(self.labels[index])
-        return (tree, sent, label)
+        return tree, sent, label
 
     def read_sentences(self, filename):
-        with open(filename,'r', encoding='utf-8') as f:
-            sentences = [self.read_sentence(line) for line in tqdm(f.readlines())]
+        with open(filename, 'r', encoding='utf-8') as f:
+            sentences = [self.read_sentence(line)
+                         for line in tqdm(f.readlines())]
         return sentences
 
     def read_sentence(self, line):
         indices = self.vocab.convert_to_idx(line.split(), constants.UNK_WORD)
         return torch.LongTensor(indices)
 
-    def read_trees(self, filename_parents, filename_labels, filename_tokens, filename_relations):
-        parents_file = open(filename_parents, 'r', encoding='utf-8') # parent node
-        labels_file = open(filename_labels, 'r', encoding='utf-8') # label of a node
+    def read_trees(self, filename_parents, filename_labels, filename_tokens,
+                   filename_relations):
+        parents_file = open(filename_parents, 'r', encoding='utf-8')
+        labels_file = open(filename_labels, 'r', encoding='utf-8')
         tokens_file = open(filename_tokens, 'r', encoding='utf-8')
         relations_file = open(filename_relations, 'r', encoding='utf-8')
         iterator = zip(parents_file.readlines(), labels_file.readlines(),
@@ -108,7 +119,7 @@ class SSTDataset(data.Dataset):
                     if parent in trees.keys():
                         trees[parent].add_child(tree)
                         break
-                    elif parent==0:
+                    elif parent == 0:
                         root = tree
                         break
                     else:

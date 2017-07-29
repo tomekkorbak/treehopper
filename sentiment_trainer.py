@@ -1,8 +1,8 @@
 from tqdm import tqdm
 import torch
 from torch.autograd import Variable as Var
-from utils import map_label_to_target_sentiment
 import torch.nn.functional as F
+
 
 class SentimentTrainer(object):
     """
@@ -29,7 +29,7 @@ class SentimentTrainer(object):
         for idx in tqdm(range(len(dataset)),desc='Training epoch '+str(self.epoch+1)+''):
             tree, sent, label = dataset[indices[idx]]
             input = Var(sent)
-            target = Var(map_label_to_target_sentiment(label, dataset.num_classes))
+            target = Var(torch.LongTensor([int(label)]))
             if self.args.cuda:
                 input = input.cuda()
                 target = target.cuda()
@@ -60,10 +60,10 @@ class SentimentTrainer(object):
 
         output_trees = []
 
-        for idx in tqdm(range(len(dataset)),desc='Testing epoch  '+str(self.epoch)+''):
+        for idx in tqdm(range(len(dataset)), desc='Testing epoch  '+str(self.epoch)+''):
             tree, sent, label = dataset[idx]
             input = Var(sent, volatile=True)
-            target = Var(map_label_to_target_sentiment(label,dataset.num_classes), volatile=True)
+            target = Var(torch.LongTensor([int(label)]), volatile=True)
             # if self.args.cuda:
             #     input = input.cuda()
             #     target = target.cuda()

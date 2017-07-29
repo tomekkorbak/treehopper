@@ -4,7 +4,9 @@ from datetime import datetime
 
 def parse_args():
         parser = argparse.ArgumentParser(description='PyTorch TreeLSTM for Sentiment Analysis Trees')
-        parser.add_argument('--name', default='%Y%m%d_%H%M'.format(datetime.now()),
+        parser.add_argument('--name',
+                            default='{date:%Y%m%d_%H%M}'.format(
+                                date=datetime.now()),
                             help='name for log and saved models')
         parser.add_argument('--saved', default='models/saved_model',
                             help='name for log and saved models')
@@ -18,6 +20,10 @@ def parse_args():
                             help='batchsize for optimizer updates')
         parser.add_argument('--epochs', default=15, type=int,
                             help='number of total epochs to run')
+        parser.add_argument('--mem_dim', default=300, type=int,
+                            help='size of LSTM hidden state')
+        parser.add_argument('--recurrent_dropout', default=0.15, type=float,
+                            help='probability of recurrent dropout')
         parser.add_argument('--lr', default=0.05, type=float,
                             metavar='LR', help='initial learning rate')
         parser.add_argument('--emblr', default=0.1, type=float,
@@ -37,9 +43,7 @@ def parse_args():
         cuda_parser = parser.add_mutually_exclusive_group(required=False)
         cuda_parser.add_argument('--cuda', dest='cuda', action='store_true')
         cuda_parser.add_argument('--no-cuda', dest='cuda', action='store_false')
-        cuda_parser.add_argument('--lower', dest='cuda', action='store_true')
-        parser.set_defaults(cuda=True)
-        parser.set_defaults(lower=True)
+        parser.set_defaults(cuda=False)
 
         args = parser.parse_args()
         return args

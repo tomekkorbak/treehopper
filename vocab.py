@@ -1,82 +1,87 @@
-# vocab object from harvardnlp/opennmt-py
+import os
+
+
+def build_vocab(filenames, vocabfile):
+    """Write unique words from a set of files to a new file"""
+    if os.path.isfile(vocabfile):
+        print('Loading existing vocabulary from', vocabfile)
+        return
+    vocab = set()
+    for filename in filenames:
+        with open(filename, 'r', encoding='utf-8') as f:
+            for line in f:
+                tokens = line.rstrip('\n').lower().split()
+                vocab |= set(tokens)
+    with open(vocabfile, 'w', encoding='utf-8') as f:
+        for token in vocab:
+            f.write(token + '\n')
+
+
 class Vocab(object):
-    def __init__(self, filename=None, data=None, lower=False):
-        self.idx_to_label = {}
-        self.label_to_idx = {}
-        self.lower = lower
+    def __init__(self, filename=None):
+        self.idx_to_token = {}
+        self.token_to_idx = {}
 
-        # Special entries will not be pruned.
-        self.special = []
-
-        if data: self.add_specials(data)
-        if filename: self.load_file(filename)
+        if filename:
+            self.load_file(filename)
 
     def size(self):
-        return len(self.idx_to_label)
+        return len(self.idx_to_token)
 
-    # Load entries from a file.
     def load_file(self, filename):
+        """Load entries from a file."""
         for line in open(filename, encoding='utf-8'):
-            self.add_label(line.rstrip('\n'))
+            self.add_token(line.rstrip('\n'))
 
     def get_index(self, key, default=None):
-        if self.lower:
-            key = key.lower()
+        key = key.lower()
         try:
-            return self.label_to_idx[key]
+            return self.token_to_idx[key]
         except KeyError:
             return default
 
-    def get_label(self, idx, default=None):
+    def get_token(self, idx, default=None):
         try:
-            return self.idx_to_label[idx]
+            return self.idx_to_token[idx]
         except KeyError:
             return default
 
-    # Mark this `label` and `idx` as special
-    def ads_special(self, label, idx=None):
-        idx = self.add_label(label)
-        self.special += [idx]
+    def add_token(self, label):
+        label = label.lower()
 
-    # Mark all labels in `labels` as specials
-    def add_specials(self, labels):
-        for label in labels:
-            self.ads_special(label)
-
-    # Add `label` in the dictionary. Use `idx` as its index if given.
-    def add_label(self, label):
-        if self.lower:
-            label = label.lower()
-
-        if label in self.label_to_idx:
-            idx = self.label_to_idx[label]
+        if label in self.token_to_idx:
+            idx = self.token_to_idx[label]
         else:
-            idx = len(self.idx_to_label)
-            self.idx_to_label[idx] = label
-            self.label_to_idx[label] = idx
+            idx = len(self.idx_to_token)
+            self.idx_to_token[idx] = label
+            self.token_to_idx[label] = idx
         return idx
 
-    # Convert `labels` to indices. Use `unkWord` if not found.
-    # Optionally insert `bosWord` at the beginning and `eosWord` at the .
-    def convert_to_idx(self, labels, unk_word, bos_word=None, eos_word=None):
+    def convert_to_idx(self, tokens, unk_word, bos_word=None, eos_word=None):
+        """Convert tokens to indices. Use `unk_word` if token is not found. 
+        Optionally insert `bos_word` and `eos_word` at the begging and at the 
+        end of the list of indices.
+        """
         vec = []
 
         if bos_word is not None:
             vec += [self.get_index(bos_word)]
 
         unk = self.get_index(unk_word)
-        vec += [self.get_index(label, default=unk) for label in labels]
+        vec += [self.get_index(token, default=unk) for token in tokens]
 
         if eos_word is not None:
             vec += [self.get_index(eos_word)]
 
         return vec
 
-    # Convert `idx` to labels. If index `stop` is reached, convert it and return.
-    def convert_to_labels(self, idx, stop):
-        labels = []
+    def convert_to_tokens(self, idx, stop):
+        """Convert indices to tokens. If index `stop` is reached, convert it 
+        and return.
+        """
+        tokens = []
         for i in idx:
-            labels += [self.get_label(i)]
+            tokens += [self.get_token(i)]
             if i == stop:
                 break
-        return labels
+        return tokens
