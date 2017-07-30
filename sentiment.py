@@ -24,6 +24,8 @@ def set_arguments(grid_args):
         args.mem_dim = grid_args['mem_dim']
     if 'recurrent_dropout' in grid_args:
         args.recurrent_dropout = grid_args['recurrent_dropout']
+    if 'emlr' in grid_args['emblr']:
+        args.emblr = grid_args['emblr']
     args.calculate_new_words = True
     dim_from_file = re.search("((\d+)d$)|((\d+)$)", args.emb_file)
     args.input_dim = int(dim_from_file.group(0)) if dim_from_file else 300
@@ -76,11 +78,11 @@ def main(grid_args={}):
         )
         max_dev_epoch, max_dev = np.mean(all_dev_epoch), np.mean(all_dev)
 
-    with open("results.csv", "a") as result_file:
-        result_file.write(
-            str(args.input_dim) + "," + args.split[0] + "," +
-            str(max_dev_epoch) + "," + str(max_dev) + "\n"
-        )
+    with open(args.name + '_resluts', 'a') as result_file:
+        result_file.write('Epoch {epoch}, accuracy {acc:f.4}\n'.format(
+            epoch=max_dev_epoch,
+            acc=max_dev
+        ))
 
 
 def kfold_training(dataset,vocab, split, train_dataset, dev_dataset,args):
