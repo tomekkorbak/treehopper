@@ -83,6 +83,7 @@ def main(grid_args={}):
             epoch=max_dev_epoch,
             acc=max_dev
         ))
+    return max_dev_epoch, max_dev
 
 
 def kfold_training(dataset,vocab, split, train_dataset, dev_dataset,args):
