@@ -78,7 +78,7 @@ def main(grid_args={}):
         )
         max_dev_epoch, max_dev = np.mean(all_dev_epoch), np.mean(all_dev)
 
-    with open(args.name + '_resluts', 'a') as result_file:
+    with open(args.name + '_results', 'a') as result_file:
         result_file.write('Epoch {epoch}, accuracy {acc:f.4}\n'.format(
             epoch=max_dev_epoch,
             acc=max_dev
