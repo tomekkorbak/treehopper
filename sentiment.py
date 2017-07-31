@@ -31,7 +31,7 @@ def set_arguments(grid_args):
     args.input_dim = int(dim_from_file.group(0)) if dim_from_file else 300
     args.num_classes = 3  # -1 0 1
     args.cuda = args.cuda and torch.cuda.is_available()
-    args.split = ("simple", 0.9) #("simple",size_of_train),("random",size_of_dev),("kfold", number_of_folds)
+    args.split = ("simple",(0.1,0.1)) #("simple",size_of_train),("random",size_of_dev),("kfold", number_of_folds)
     print(args)
     return args
 
@@ -48,14 +48,16 @@ def main(grid_args={}):
     vocab = Vocab(filename=vocab_file)
     full_dataset = SSTDataset(train_dir, vocab, args.num_classes)
 
-    train_dataset, dev_dataset = SSTDataset(num_classes=args.num_classes), \
-                                 SSTDataset(num_classes=args.num_classes)
+    train_dataset = SSTDataset(num_classes=args.num_classes)
+    test_dataset  = SSTDataset(num_classes=args.num_classes)
+    dev_dataset   = SSTDataset(num_classes=args.num_classes)
 
     if args.split[0] == "simple":
-        train_dataset, dev_dataset = split_dataset_simple(
+        train_dataset, dev_dataset, test_dataset = split_dataset_simple(
             full_dataset,
             train_dataset,
             dev_dataset,
+            test_dataset,
             split=args.split[1]
         )
         max_dev_epoch, max_dev = train(train_dataset, dev_dataset, vocab, args)

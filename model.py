@@ -70,7 +70,8 @@ class ChildSumTreeLSTM(nn.Module):
         child_c, child_h = self.get_children_states(tree)
         tree.state = self.node_forward(embs[tree.idx-1], child_c, child_h, training)
 
-        output = self.output_module.forward(tree.state[1], training)
+        output, output_softmax = self.output_module.forward(tree.state[1], training)
+        tree.output_softmax = output_softmax
         tree.output = output
         if training and tree.gold_label is not None:
             target = Var(torch.LongTensor([tree.gold_label]))
@@ -106,13 +107,18 @@ class SentimentModule(nn.Module):
         self.dropout = dropout
         self.linear_layer = nn.Linear(self.mem_dim, self.num_classes)
         self.logsoftmax = nn.LogSoftmax()
+        self.softmax = nn.Softmax()
         if self.cuda_flag:
             self.linear_layer = self.linear_layer.cuda()
 
     def forward(self, vec, training=False):
+
         return self.logsoftmax(self.linear_layer(F.dropout(vec,
                                                            p=self.dropout,
-                                                           training=training)))
+                                                           training=training))),\
+               self.softmax(self.linear_layer(F.dropout(vec,
+                                                p=self.dropout,
+                                                training=training)))
 
 
 class TreeLSTMSentiment(nn.Module):
@@ -124,4 +130,4 @@ class TreeLSTMSentiment(nn.Module):
 
     def forward(self, tree, inputs, training=False):
         _, loss = self.tree_module(tree, inputs, training)
-        return tree.output, loss, tree.compute_accuracy()
+        return tree.output, loss, tree.compute_accuracy(), tree.output_softmax

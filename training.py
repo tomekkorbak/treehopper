@@ -49,13 +49,15 @@ def train(train_dataset, dev_dataset, vocab, args):
         dev_acc = torch.mean(dev_acc)
         print('==> Train loss   : %f \t' % train_loss, end="")
         print('Epoch ', epoch, 'dev percentage ', dev_acc)
-        torch.save(model, args.saved + str(epoch) + '_model_' + filename)
+        model_filename = args.saved + str(epoch) + '_model_' + filename
+        torch.save(model,model_filename)
         torch.save(embedding_model, args.saved + str(epoch) + '_embedding_' + filename)
         if dev_acc > max_dev:
             max_dev = dev_acc
             max_dev_epoch = epoch
+            max_model_filename = model_filename
         gc.collect()
     print('epoch ' + str(max_dev_epoch) + ' dev score of ' + str(max_dev))
 
-    return max_dev_epoch, max_dev
+    return max_dev_epoch, max_dev, max_model_filename
 

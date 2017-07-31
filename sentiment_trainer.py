@@ -34,7 +34,7 @@ class SentimentTrainer(object):
                 input = input.cuda()
                 target = target.cuda()
             emb = F.torch.unsqueeze(self.embedding_model(input), 1)
-            output, err, _ = self.model.forward(tree, emb, training=True)
+            output, err, _, _ = self.model.forward(tree, emb, training=True)
             #params = self.model.childsumtreelstm.getParameters()
             # params_norm = params.norm()
             err = err/self.args.batchsize # + 0.5*self.args.reg*params_norm*params_norm # custom bias
@@ -59,7 +59,7 @@ class SentimentTrainer(object):
         accuracies = torch.zeros(len(dataset))
 
         output_trees = []
-
+        outputs = []
         for idx in tqdm(range(len(dataset)), desc='Testing epoch  '+str(self.epoch)+''):
             tree, sent, label = dataset[idx]
             input = Var(sent, volatile=True)
@@ -68,10 +68,11 @@ class SentimentTrainer(object):
             #     input = input.cuda()
             #     target = target.cuda()
             emb = F.torch.unsqueeze(self.embedding_model(input),1)
-            output, _, acc = self.model(tree, emb)
+            output, _, acc, softmax = self.model(tree, emb)
             err = self.criterion(output, target)
             loss += err.data[0]
             accuracies[idx] = acc
             output_trees.append(tree)
+            outputs.append(softmax.data.numpy())
             # predictions[idx] = torch.dot(indices,torch.exp(output.data.cpu()))
-        return loss/len(dataset), accuracies, output_trees
+        return loss/len(dataset), accuracies, outputs

@@ -1,13 +1,14 @@
 from sklearn.model_selection import train_test_split
 
 
-def split_dataset_simple(dataset,train_dataset,dev_dataset,split=0.9):
-    splitting_point = int(len(dataset) * split)
-    train_dataset.trees, dev_dataset.trees = dataset.trees[:splitting_point], dataset.trees[splitting_point:]
-    train_dataset.sentences, dev_dataset.sentences = dataset.sentences[:splitting_point], dataset.sentences[
-                                                                                          splitting_point:]
-    train_dataset.labels, dev_dataset.labels = dataset.labels[:splitting_point], dataset.labels[splitting_point:]
-    return train_dataset, dev_dataset
+def split_dataset_simple(dataset,train_dataset,dev_dataset, test_dataset,split=(0.1,0.1)):
+    # splitting_point = int(len(dataset) * split)
+    dev_split_start = int((1 - split[0] - split[1])*len(dataset))
+    test_split_start = int((1 - split[1]) * len(dataset))
+    train_dataset.trees, dev_dataset.trees,test_dataset.trees = dataset.trees[:dev_split_start], dataset.trees[dev_split_start:test_split_start],dataset.trees[test_split_start:]
+    train_dataset.sentences, dev_dataset.sentences,test_dataset.sentences = dataset.sentences[:dev_split_start], dataset.sentences[dev_split_start:test_split_start],dataset.sentences[test_split_start:]
+    train_dataset.labels, dev_dataset.labels,test_dataset.labels = dataset.labels[:dev_split_start], dataset.labels[dev_split_start:test_split_start],dataset.labels[test_split_start:]
+    return train_dataset, dev_dataset, test_dataset
 
 
 def split_dataset_random(dataset, train_dataset, dev_dataset,test_size=0.1):
