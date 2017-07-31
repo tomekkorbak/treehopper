@@ -44,22 +44,32 @@ class ChildSumTreeLSTM(nn.Module):
         f = F.torch.unsqueeze(f, 1)
         fc = F.torch.squeeze(F.torch.mul(f, child_c), 1)
 
+        idx = Var(torch.multinomial(torch.ones(child_c.size(0)), 1), requires_grad=False)
+
         c = zoneout(
             current_input=F.torch.mul(i, u) + F.torch.sum(fc, 0),
-            previous_input=F.torch.sum(fc, 0),
+            previous_input=F.torch.squeeze(child_c.index_select(0, idx), 0),
             p=self.recurrent_dropout_p,
-            training=training
+            training=training,
+            mask=self.mask
         )
         h = zoneout(
             current_input=F.torch.mul(o, F.tanh(c)),
-            previous_input=child_h_sum,
+            previous_input=F.torch.squeeze(child_h.index_select(0, idx), 0),
             p=self.recurrent_dropout_p,
-            training=training
+            training=training,
+            mask=self.mask
         )
 
         return c, h
 
     def forward(self, tree, embs, training=False):
+        # Zoneout mask
+        self.mask = torch.Tensor(1, self.mem_dim).bernoulli_(
+            1 - self.recurrent_dropout_p)
+
+
+
         loss = Var(torch.zeros(1))  # initialize loss with zero
         if self.cuda_flag:
             loss = loss.cuda()
