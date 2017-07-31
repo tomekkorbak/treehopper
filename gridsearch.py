@@ -12,11 +12,11 @@ def grid_search():
         ("data/pol/fasttext", "wiki.pl")
     ]
     param_grid["optim"] = ["adam", "adagrad"]
-    # param_grid["wd"] = [0, 1e-5]
+    param_grid["wd"] = [0, 1e-5]
     # param_grid['reweight'] = [True, False]
-    param_grid['mem_dim'] = [300, 400, 500]
-    param_grid['recurrent_dropout'] = [0, 0.05, 0.1, 0.15, 0.3, 0.5]
-    # param_grid['emblr'] = [0.01, 0.1]
+    # param_grid['mem_dim'] = [300, 400, 500]
+    param_grid['recurrent_dropout'] = [0.01, 0.05, 0.15, 0.3, 0.5]
+    param_grid['emblr'] = [0.01, 0.1, 0.2]
     param_grid['name'] = ['{date:%Y%m%d_%H%M}'.format(date=datetime.now())]
     grid = ParameterGrid(param_grid)
 

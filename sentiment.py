@@ -40,11 +40,11 @@ def main(grid_args={}):
     args = set_arguments(grid_args)
 
     train_dir = 'training-treebank'
-    vocab_file = 'vocab.txt'
+    vocab_file = 'tmp/vocab.txt'
     build_vocab([
         'training-treebank/rev_sentence.txt',
         'training-treebank/sklad_sentence.txt'
-    ], 'vocab.txt')
+    ], 'tmp/vocab.txt')
     vocab = Vocab(filename=vocab_file)
     full_dataset = SSTDataset(train_dir, vocab, args.num_classes)
 
@@ -78,11 +78,11 @@ def main(grid_args={}):
         )
         max_dev_epoch, max_dev = np.mean(all_dev_epoch), np.mean(all_dev)
 
-    with open(args.name + '_results', 'a') as result_file:
-        result_file.write('Epoch {epoch}, accuracy {acc:.4f}\n'.format(
-            epoch=max_dev_epoch,
-            acc=max_dev
-        ))
+    # with open(args.name + '_results', 'a') as result_file:
+    #     result_file.write('Epoch {epoch}, accuracy {acc:.4f}\n'.format(
+    #         epoch=max_dev_epoch,
+    #         acc=max_dev
+    #     ))
     return max_dev_epoch, max_dev
 
 
