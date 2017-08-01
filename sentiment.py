@@ -22,8 +22,16 @@ def set_arguments(grid_args):
         args.wd = grid_args["wd"]
     if "mem_dim" in grid_args:
         args.mem_dim = grid_args['mem_dim']
-    if 'recurrent_dropout' in grid_args:
-        args.recurrent_dropout = grid_args['recurrent_dropout']
+    if 'recurrent_dropout_c' in grid_args:
+        args.recurrent_dropout = grid_args['recurrent_dropout_c']
+    if 'recurrent_dropout_h' in grid_args:
+        args.recurrent_dropout = grid_args['recurrent_dropout_h']
+    if 'zoneout_strategy' in grid_args:
+        args.recurrent_dropout = grid_args['zoneout_strategy']
+    if 'common_mask' in grid_args:
+        args.recurrent_dropout = grid_args['common_mask']
+    if 'zoneout_choose_child' in grid_args:
+        args.recurrent_dropout = grid_args['zoneout_choose_child']
     if 'emblr' in grid_args:
         args.emblr = grid_args['emblr']
     args.calculate_new_words = True

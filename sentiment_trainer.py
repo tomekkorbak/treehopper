@@ -64,9 +64,9 @@ class SentimentTrainer(object):
             tree, sent, label = dataset[idx]
             input = Var(sent, volatile=True)
             target = Var(torch.LongTensor([int(label)]), volatile=True)
-            # if self.args.cuda:
-            #     input = input.cuda()
-            #     target = target.cuda()
+            if self.args.cuda:
+                input = input.cuda()
+                target = target.cuda()
             emb = F.torch.unsqueeze(self.embedding_model(input),1)
             output, _, acc, tree = self.model(tree, emb)
             err = self.criterion(output, target)

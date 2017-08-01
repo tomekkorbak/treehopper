@@ -69,7 +69,7 @@ class Tree(object):
             """
             if accuracies is None:
                 accuracies = []
-            accuracies.append(1 if torch.max(tree.output, 1)[1].data.numpy()[0][0] == tree.gold_label else 0)
+            accuracies.append(1 if torch.max(tree.output, 1)[1].data.cpu().numpy()[0][0] == tree.gold_label else 0)
             for subtree in tree.children:
                 _compute_accuracy(subtree, accuracies)
             return accuracies
@@ -98,7 +98,7 @@ def get_label(tree, with_output=False):
             print(tree.children)
             print(tree.word)
             print(tree.gold_label)
-        output_label = torch.max(tree.output, 1)[1].data.numpy()[0][0]-1
+        output_label = torch.max(tree.output, 1)[1].data.cpu().numpy()[0][0]-1
 
         sentiment_label = 'should {}/is {}'.format(
             str(tree.gold_label - 1), output_label)

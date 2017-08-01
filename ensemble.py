@@ -69,7 +69,7 @@ def ensemble_train():
         # all_dev_outputs.append(dev_output)
 
     all_trees = zip(*all_trees)
-    accuracies  = []
+    accuracies = []
     for i in all_trees:
         accuracies.append(compute_accuracy_for_ensemble(i))
     print(np.mean(np.asarray(accuracies)))

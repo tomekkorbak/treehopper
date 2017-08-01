@@ -11,12 +11,15 @@ def grid_search():
         # ("data/pol/lemma", "w2v_allwiki_nkjp300_300"),
         ("data/pol/fasttext", "wiki.pl")
     ]
-    param_grid["optim"] = ["adam", "adagrad"]
-    param_grid["wd"] = [0, 1e-5]
+    # param_grid["optim"] = ["adam", "adagrad"]
+    # param_grid["wd"] = [0, 1e-5]
     # param_grid['reweight'] = [True, False]
     # param_grid['mem_dim'] = [300, 400, 500]
-    param_grid['recurrent_dropout'] = [0.01, 0.05, 0.15, 0.3, 0.5]
-    param_grid['emblr'] = [0.01, 0.1, 0.2]
+    param_grid['recurrent_dropout_h'] = [0.01,]
+    param_grid['recurrent_dropout_c'] = [0.01, ]
+    param_grid['zoneout_choose_child'] = [True, False]
+    param_grid['common_mask'] = [True, False]
+    # param_grid['emblr'] = [0.01, 0.1, 0.2]
     param_grid['name'] = ['{date:%Y%m%d_%H%M}'.format(date=datetime.now())]
     grid = ParameterGrid(param_grid)
 

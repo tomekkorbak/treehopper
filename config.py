@@ -18,12 +18,18 @@ def parse_args():
                             help='file with embeddings')
         parser.add_argument('--batchsize', default=25, type=int,
                             help='batchsize for optimizer updates')
-        parser.add_argument('--epochs', default=25, type=int,
+        parser.add_argument('--epochs', default=1, type=int,
                             help='number of total epochs to run')
         parser.add_argument('--mem_dim', default=300, type=int,
                             help='size of LSTM hidden state')
-        parser.add_argument('--recurrent_dropout', default=0.15, type=float,
-                            help='probability of recurrent dropout')
+        parser.add_argument('--recurrent_dropout_c', default=0.15, type=float,
+                            help='probability of recurrent dropout for cell state')
+        parser.add_argument('--recurrent_dropout_h', default=0.15, type=float,
+                            help='probability of recurrent dropout for hidden state')
+        parser.add_argument('--zoneout_choose_child', default=False, type=bool,
+                            help='tba')
+        parser.add_argument('--common_mask', default=False, type=bool,
+                            help='tba')
         parser.add_argument('--lr', default=0.05, type=float,
                             metavar='LR', help='initial learning rate')
         parser.add_argument('--emblr', default=0.1, type=float,
