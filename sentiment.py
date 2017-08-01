@@ -31,7 +31,7 @@ def set_arguments(grid_args):
     args.input_dim = int(dim_from_file.group(0)) if dim_from_file else 300
     args.num_classes = 3  # -1 0 1
     args.cuda = args.cuda and torch.cuda.is_available()
-    args.split = ('random', 0.1) if args.folds == 1 else ('kfold', args.folds)
+    args.split = ('simple', 0.1) if args.folds == 1 else ('kfold', args.folds)
     #("simple",(dev_size,test_size)),("random",size_of_dev),("kfold", number_of_folds)
     print(args)
     return args
