@@ -18,7 +18,7 @@ def parse_args():
                             help='file with embeddings')
         parser.add_argument('--batchsize', default=25, type=int,
                             help='batchsize for optimizer updates')
-        parser.add_argument('--epochs', default=15, type=int,
+        parser.add_argument('--epochs', default=25, type=int,
                             help='number of total epochs to run')
         parser.add_argument('--mem_dim', default=300, type=int,
                             help='size of LSTM hidden state')

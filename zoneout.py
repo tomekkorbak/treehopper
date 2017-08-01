@@ -42,7 +42,7 @@ class Zoneout(InplaceFunction):
      https://arxiv.org/abs/1606.01305
     """
 
-    def __init__(self, p=0.15, train=False, inplace=False):
+    def __init__(self, p=0.15, train=False, inplace=False, mask=None):
         super(Zoneout, self).__init__()
         if p < 0 or p > 1:
             raise ValueError("zoneout probability has to be between 0 and 1, "
@@ -50,6 +50,7 @@ class Zoneout(InplaceFunction):
         self.p = p
         self.train = train
         self.inplace = inplace
+        self.mask = mask
 
     def _make_noise(self, input):
         return input.new().resize_as_(input)
@@ -71,7 +72,10 @@ class Zoneout(InplaceFunction):
         self.previous_mask = self._make_noise(previous_input)
 
         if self.train:
-            self.current_mask.bernoulli_(1 - self.p)
+            if self.mask is not None:
+                self.current_mask = self.mask
+            else:
+                self.current_mask.bernoulli_(1 - self.p)
             self.previous_mask.fill_(1).sub_(self.current_mask)
             output = (current_input * self.current_mask) + \
                      (previous_input * self.previous_mask)
@@ -87,5 +91,5 @@ class Zoneout(InplaceFunction):
                grad_output * self.previous_mask
 
 
-def zoneout(current_input, previous_input, p=0.15, training=False, inplace=False):
-    return Zoneout(p, training, inplace)(current_input, previous_input)
+def zoneout(current_input, previous_input, p=0.15, training=False, inplace=False, mask=None):
+    return Zoneout(p, training, inplace, mask)(current_input, previous_input)

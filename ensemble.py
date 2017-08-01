@@ -14,12 +14,29 @@ from vocab import Vocab, build_vocab
 import numpy as np
 
 
+def test_acc(all_outputs,test_dataset, type):
+    ensemble_output = []
+    all_outputs = zip(*all_outputs)
+    for elem in all_outputs:
+        elem = np.asarray(elem)
+        if type == "vote":
+            max_elems = np.argmax(elem, axis=2)
+            output = np.argmax(np.bincount(np.reshape(max_elems, len(max_elems))))
+        else:
+            avg_elems = np.mean(elem, axis=1)
+            output = np.argmax(avg_elems)
+        ensemble_output.append(output)
+    return accuracy_score(test_dataset.labels, ensemble_output)
+
+
 def ensemble_train():
     type = "avg"
-    train = False
+    train = True
 
     args = sentiment.set_arguments({})
-    models_filenames = ["models/saved_model0_model_20170731_2014.pth"]
+    models_filenames = ["models/saved_model14_model_20170731_2027.pth",
+                        "models/saved_model14_model_20170731_2209.pth"
+                        ]
     train_dir = 'training-treebank'
     vocab_file = 'vocab.txt'
     build_vocab([
@@ -41,45 +58,50 @@ def ensemble_train():
         models = load_best_models(models_filenames)
 
     all_outputs = []
+    all_trees = []
     all_dev_outputs = []
     for model in models:
-        test_loss, test_pred, outputs = model.test(test_dataset)
-        all_outputs.append(outputs)
+        _, _, test_output, test_trees = model.test(test_dataset)
+        all_outputs.append(test_output)
+        all_trees.append(test_trees)
 
-        test_loss, test_pred, dev_outputs = model.test(dev_dataset)
-        all_dev_outputs.append(dev_outputs)
+        # _, _, dev_output, dev_trees = model.test(dev_dataset)
+        # all_dev_outputs.append(dev_output)
+
+    all_trees = zip(*all_trees)
+    accuracies  = []
+    for i in all_trees:
+        accuracies.append(compute_accuracy_for_ensemble(i))
+    print(np.mean(np.asarray(accuracies)))
+    # accuracy = test_acc(all_outputs,test_dataset, type)
+    # print("Test")
+    # print(accuracy)
+    #
+    # accuracy = test_acc(all_dev_outputs,dev_dataset, type)
+    # print("Dev")
+    # print(accuracy)
+
+def compute_accuracy_for_ensemble(list_trees):
+
+    def _compute_accuracy(list_trees, accuracies=None):
+        """
+        Recursively compute accuracies for every subtree
+        """
+        if accuracies is None:
+            accuracies = []
 
 
-    ensemble_output = []
-    all_outputs = zip(*all_outputs)
-    for elem in all_outputs:
-        elem = np.asarray(elem)
-        if type == "vote":
-            max_elems = np.argmax(elem, axis=2)
-            output = np.argmax(np.bincount(np.reshape(max_elems, len(max_elems))))
-        else:
-            avg_elems = np.mean(elem, axis=1)
-            output = np.argmax(avg_elems)
-        ensemble_output.append(output)
-    accuracy = accuracy_score(test_dataset.labels, ensemble_output)
-    print("Test")
-    print(accuracy)
+        out = np.asarray([np.reshape(x.output.data.numpy(),3) for x in list_trees])
+        avg_elems = np.mean(out, axis=0)
+        output = np.argmax(avg_elems)
+        accuracies.append(1 if output == list_trees[0].gold_label else 0)
+        subtrees = zip(*[x.children for x in list_trees])
+        for subtree in subtrees:
+            _compute_accuracy(subtree, accuracies)
+        return accuracies
 
-    ensemble_output = []
-    all_dev_outputs = zip(*all_dev_outputs)
-    for elem in all_dev_outputs:
-        elem = np.asarray(elem)
-        if type == "vote":
-            max_elems = np.argmax(elem, axis=2)
-            output = np.argmax(np.bincount(np.reshape(max_elems, len(max_elems))))
-        else:
-            avg_elems = np.mean(elem, axis=1)
-            output = np.argmax(avg_elems)
-        ensemble_output.append(output)
-    accuracy = accuracy_score(dev_dataset.labels, ensemble_output)
-    print("Dev")
-    print(accuracy)
-
+    total_accuracies = _compute_accuracy(list_trees)
+    return np.mean(total_accuracies)
 
 def load_best_models(models_filenames):
     models = []

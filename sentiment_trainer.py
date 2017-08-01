@@ -68,11 +68,11 @@ class SentimentTrainer(object):
             #     input = input.cuda()
             #     target = target.cuda()
             emb = F.torch.unsqueeze(self.embedding_model(input),1)
-            output, _, acc, softmax = self.model(tree, emb)
+            output, _, acc, tree = self.model(tree, emb)
             err = self.criterion(output, target)
             loss += err.data[0]
             accuracies[idx] = acc
             output_trees.append(tree)
-            outputs.append(softmax.data.numpy())
+            outputs.append(tree.output_softmax.data.numpy())
             # predictions[idx] = torch.dot(indices,torch.exp(output.data.cpu()))
-        return loss/len(dataset), accuracies, outputs
+        return loss/len(dataset), accuracies, outputs, output_trees

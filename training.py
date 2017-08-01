@@ -45,7 +45,7 @@ def train(train_dataset, dev_dataset, vocab, args):
     filename = args.name + '.pth'
     for epoch in range(args.epochs):
         train_loss = trainer.train(train_dataset)
-        dev_loss, dev_acc, _ = trainer.test(dev_dataset)
+        dev_loss, dev_acc, _, _ = trainer.test(dev_dataset)
         dev_acc = torch.mean(dev_acc)
         print('==> Train loss   : %f \t' % train_loss, end="")
         print('Epoch ', epoch, 'dev percentage ', dev_acc)

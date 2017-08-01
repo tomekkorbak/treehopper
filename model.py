@@ -44,22 +44,32 @@ class ChildSumTreeLSTM(nn.Module):
         f = F.torch.unsqueeze(f, 1)
         fc = F.torch.squeeze(F.torch.mul(f, child_c), 1)
 
+        idx = Var(torch.multinomial(torch.ones(child_c.size(0)), 1), requires_grad=False)
+
         c = zoneout(
             current_input=F.torch.mul(i, u) + F.torch.sum(fc, 0),
-            previous_input=F.torch.sum(fc, 0),
+            previous_input=F.torch.squeeze(child_c.index_select(0, idx), 0),
             p=self.recurrent_dropout_p,
-            training=training
+            training=training,
+            mask=self.mask
         )
         h = zoneout(
             current_input=F.torch.mul(o, F.tanh(c)),
-            previous_input=child_h_sum,
+            previous_input=F.torch.squeeze(child_h.index_select(0, idx), 0),
             p=self.recurrent_dropout_p,
-            training=training
+            training=training,
+            mask=self.mask
         )
 
         return c, h
 
     def forward(self, tree, embs, training=False):
+        # Zoneout mask
+        self.mask = torch.Tensor(1, self.mem_dim).bernoulli_(
+            1 - self.recurrent_dropout_p)
+
+
+
         loss = Var(torch.zeros(1))  # initialize loss with zero
         if self.cuda_flag:
             loss = loss.cuda()
@@ -69,7 +79,6 @@ class ChildSumTreeLSTM(nn.Module):
             loss += child_loss
         child_c, child_h = self.get_children_states(tree)
         tree.state = self.node_forward(embs[tree.idx-1], child_c, child_h, training)
-
         output, output_softmax = self.output_module.forward(tree.state[1], training)
         tree.output_softmax = output_softmax
         tree.output = output
@@ -130,4 +139,4 @@ class TreeLSTMSentiment(nn.Module):
 
     def forward(self, tree, inputs, training=False):
         _, loss = self.tree_module(tree, inputs, training)
-        return tree.output, loss, tree.compute_accuracy(), tree.output_softmax
+        return tree.output, loss, tree.compute_accuracy(),tree

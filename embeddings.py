@@ -33,11 +33,11 @@ def load_word_vectors(embeddings_path):
 
 
 def apply_not_known_words(emb,args, not_known,vocab):
-    new_words = 'new_words.txt'
+    new_words = 'tmp/new_words.txt'
     f = open(new_words, 'w', encoding='utf-8')
     for item in not_known:
         f.write("%s\n" % item)
-    cmd = " ".join(["./../fastText/fasttext", "print-word-vectors",
+    cmd = " ".join(["./fastText/fasttext", "print-word-vectors",
                     args.emb_dir + "/" + args.emb_file + ".bin", "<", new_words])
     print(cmd)
     ps = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)

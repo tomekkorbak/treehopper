@@ -1,0 +1,12 @@
+20170*
+__pycache__
+results*
+vocab.txt
+new_words.txt
+training-treebank/
+data/
+models/
+.ipynb_checkpoints/
+.floydexpt
+.floydignore
+/tmp/
