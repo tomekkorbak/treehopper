@@ -14,7 +14,7 @@ def grid_search():
     # param_grid["optim"] = ["adam", "adagrad"]
     # param_grid["wd"] = [0, 1e-5]
     # param_grid['reweight'] = [True, False]
-    # param_grid['mem_dim'] = [300, 400, 500]
+    param_grid['mem_dim'] = [300, 400, 500]
     param_grid['recurrent_dropout_h'] = [0.01,]
     param_grid['recurrent_dropout_c'] = [0.01, ]
     param_grid['zoneout_choose_child'] = [True, False]
