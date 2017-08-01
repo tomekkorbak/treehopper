@@ -31,7 +31,7 @@ def set_arguments(grid_args):
     args.input_dim = int(dim_from_file.group(0)) if dim_from_file else 300
     args.num_classes = 3  # -1 0 1
     args.cuda = args.cuda and torch.cuda.is_available()
-    args.split = ('simple', (0.1,0.1)) if args.folds == 1 else ('kfold', args.folds)
+    args.split = ('random', 0.1) if args.folds == 1 else ('kfold', args.folds)
     #("simple",(dev_size,test_size)),("random",size_of_dev),("kfold", number_of_folds)
     print(args)
     return args
@@ -61,7 +61,7 @@ def main(grid_args={}):
             test_dataset,
             split=args.split[1]
         )
-        max_dev_epoch, max_dev = train(train_dataset, dev_dataset, vocab, args)
+        max_dev_epoch, max_dev, _ = train(train_dataset, dev_dataset, vocab, args)
     elif args.split[0] == "random":
         train_dataset, dev_dataset = split_dataset_random(
             full_dataset,
@@ -69,7 +69,7 @@ def main(grid_args={}):
             dev_dataset,
             test_size=args.split[1]
         )
-        max_dev_epoch, max_dev = train(train_dataset, dev_dataset, vocab, args)
+        max_dev_epoch, max_dev, _ = train(train_dataset, dev_dataset, vocab, args)
     else:
         all_dev_epoch, all_dev = kfold_training(
             full_dataset,
@@ -100,7 +100,7 @@ def kfold_training(dataset,vocab, split, train_dataset, dev_dataset,args):
                                                          test_index,
                                                          train_dataset,
                                                          dev_dataset)
-        dev_epoch, dev = train(train_dataset, dev_dataset, vocab, args)
+        dev_epoch, dev, _ = train(train_dataset, dev_dataset, vocab, args)
         max_dev_epoch.append(dev_epoch), max_dev.append(dev)
     return max_dev_epoch, max_dev
 
