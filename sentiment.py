@@ -31,7 +31,8 @@ def set_arguments(grid_args):
     args.input_dim = int(dim_from_file.group(0)) if dim_from_file else 300
     args.num_classes = 3  # -1 0 1
     args.cuda = args.cuda and torch.cuda.is_available()
-    args.split = ("simple",(0.1,0.1)) #("simple",size_of_train),("random",size_of_dev),("kfold", number_of_folds)
+    args.split = ('simple', (0.1,0.1)) if args.folds == 1 else ('kfold', args.folds)
+    #("simple",(dev_size,test_size)),("random",size_of_dev),("kfold", number_of_folds)
     print(args)
     return args
 
@@ -80,11 +81,11 @@ def main(grid_args={}):
         )
         max_dev_epoch, max_dev = np.mean(all_dev_epoch), np.mean(all_dev)
 
-    # with open(args.name + '_results', 'a') as result_file:
-    #     result_file.write('Epoch {epoch}, accuracy {acc:.4f}\n'.format(
-    #         epoch=max_dev_epoch,
-    #         acc=max_dev
-    #     ))
+    with open(args.name + '_results', 'a') as result_file:
+        result_file.write('Epoch {epoch}, accuracy {acc:.4f}\n'.format(
+            epoch=max_dev_epoch,
+            acc=max_dev
+        ))
     return max_dev_epoch, max_dev
 
 

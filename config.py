@@ -39,6 +39,10 @@ def parse_args():
         parser.add_argument('--reweight', default=False, type=bool,
                             help='reweight loss per class to the distrubition '
                                  'of classess in the public dataset')
+        parser.add_argument('--folds', default=1, type=int,
+                            help='Number of folds for k-fold cross validation '
+                                 '(default: 1; this corresponds to simple '
+                                 'validation).')
 
         cuda_parser = parser.add_mutually_exclusive_group(required=False)
         cuda_parser.add_argument('--cuda', dest='cuda', action='store_true')
