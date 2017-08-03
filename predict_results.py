@@ -11,10 +11,12 @@ def predict(models_filename):
         'test/polevaltest_sentence.txt',
     ], 'tmp/vocab_test.txt')
     vocab = Vocab(filename=vocab_file)
-    test_dataset = SSTDataset(train_dir, vocab,num_classes=3)
+    test_dataset = SSTDataset(train_dir, vocab, num_classes=3)
     args = sentiment.set_arguments({})
     model = load_best_models([models_filename], args)[0]
     test_trees = model.predict(test_dataset)
+    test_trees[0].get_predicted_labels()
     return test_trees
 
-predict("models/saved_model0_model_20170803_2030.pth")
+predictions = predict("models/saved_model24_model_20170803_1608.pth")
+print(predictions[0].get_predicted_labels())

@@ -77,6 +77,31 @@ class Tree(object):
         total_accuracies = _compute_accuracy(self)
         return np.mean(total_accuracies)
 
+    def list_children_in_order(self):
+        assert self.parent is None, 'This method should only be called on ' \
+                                    'root nodes'
+
+        def traverse(tree, tree_list):
+            tree_list.append(tree)
+            for subtree in tree.children:
+                tree_list.append(subtree)
+                traverse(subtree, tree_list)
+            return tree_list
+
+        final_tree_list = traverse(self, [])
+        return sorted(final_tree_list, key=lambda tree: tree.idx)
+
+    def get_predicted_labels(self):
+        assert self.parent is None, 'This method should only be called on ' \
+                                    'root nodes'
+
+        return ' '.join(tree.get_output_as_string()
+                        for tree in self.list_children_in_order())
+
+    def get_output_as_string(self):
+        assert self.output is None, 'No predicted label'
+        return str(torch.max(self.output, 1)[1].data.cpu().numpy()[0][0])
+
 
 def get_arcs(tree, arcs_list=None):
     if arcs_list is None:
