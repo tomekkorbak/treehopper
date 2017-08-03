@@ -12,7 +12,10 @@ class ChildSumTreeLSTM(nn.Module):
         self.cuda_flag = args.cuda
         self.in_dim = args.input_dim
         self.mem_dim = args.mem_dim
-        self.recurrent_dropout_p = args.recurrent_dropout
+        self.recurrent_dropout_c = args.recurrent_dropout_c
+        self.recurrent_dropout_h = args.recurrent_dropout_h
+        self.commons_mask = args.common_mask
+        self.zoneout_choose_child = args.zoneout_choose_child
 
         self.ix = nn.Linear(self.in_dim, self.mem_dim)
         self.ih = nn.Linear(self.mem_dim, self.mem_dim)
@@ -45,20 +48,22 @@ class ChildSumTreeLSTM(nn.Module):
         fc = F.torch.squeeze(F.torch.mul(f, child_c), 1)
 
         idx = Var(torch.multinomial(torch.ones(child_c.size(0)), 1), requires_grad=False)
+        if self.cuda_flag:
+            idx = idx.cuda()
 
         c = zoneout(
             current_input=F.torch.mul(i, u) + F.torch.sum(fc, 0),
-            previous_input=F.torch.squeeze(child_c.index_select(0, idx), 0),
-            p=self.recurrent_dropout_p,
+            previous_input=F.torch.squeeze(child_c.index_select(0, idx), 0) if self.zoneout_choose_child else F.torch.sum(torch.squeeze(child_c, 1), 0),
+            p=self.recurrent_dropout_c,
             training=training,
-            mask=self.mask
+            mask=self.mask if self.commons_mask else None
         )
         h = zoneout(
             current_input=F.torch.mul(o, F.tanh(c)),
-            previous_input=F.torch.squeeze(child_h.index_select(0, idx), 0),
-            p=self.recurrent_dropout_p,
+            previous_input=F.torch.squeeze(child_h.index_select(0, idx), 0) if self.zoneout_choose_child else child_h_sum,
+            p=self.recurrent_dropout_h,
             training=training,
-            mask=self.mask
+            mask=self.mask if self.commons_mask else None
         )
 
         return c, h
@@ -66,9 +71,10 @@ class ChildSumTreeLSTM(nn.Module):
     def forward(self, tree, embs, training=False):
         # Zoneout mask
         self.mask = torch.Tensor(1, self.mem_dim).bernoulli_(
-            1 - self.recurrent_dropout_p)
+            1 - self.recurrent_dropout_h)
 
-
+        if self.cuda_flag:
+            self.mask = self.mask.cuda()
 
         loss = Var(torch.zeros(1))  # initialize loss with zero
         if self.cuda_flag:
