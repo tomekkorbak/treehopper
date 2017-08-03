@@ -19,8 +19,8 @@ def ensemble_train():
     train = False
 
     args = sentiment.set_arguments({})
-    models_filenames = ["models/saved_model14_model_20170731_2027.pth",
-                        "models/saved_model14_model_20170731_2209.pth"
+    models_filenames = ["models/saved_model0_model_20170803_2030.pth",
+                        "models/saved_model1_model_20170803_2030.pth"
                         ]
     train_dir = 'training-treebank'
     vocab_file = 'vocab.txt'
@@ -46,9 +46,9 @@ def ensemble_train():
                                                                     args.split[1])
 
     if train:
-        models = train_and_load_models(train_dataset, dev_dataset, vocab)
+        models = train_and_load_models(train_dataset, dev_dataset, vocab, args)
     else:
-        models = load_best_models(models_filenames)
+        models = load_best_models(models_filenames, args)
 
     all_outputs = []
     all_trees = []
@@ -86,18 +86,18 @@ def compute_accuracy_for_ensemble(list_trees):
     total_accuracies = _compute_accuracy(list_trees)
     return np.mean(total_accuracies)
 
-def load_best_models(models_filenames):
+def load_best_models(models_filenames, args):
     models = []
     for model_filename in models_filenames:
         model = torch.load(model_filename)
         emb = torch.load(model_filename.replace("model_", "embedding_"))
-        trainer = SentimentTrainer(None, model, emb,
+        trainer = SentimentTrainer(args, model, emb,
                                    criterion=nn.NLLLoss(), optimizer=None)
         models.append(trainer)
     return models
 
 
-def train_and_load_models(train_dataset, dev_dataset, vocab):
+def train_and_load_models(train_dataset, dev_dataset, vocab,args):
     models = {}
 
     # models["embeddings"] = [("data/pol/orth", "w2v_allwiki_nkjp300_300"),
@@ -118,7 +118,7 @@ def train_and_load_models(train_dataset, dev_dataset, vocab):
         max_dev_epoch, max_dev, max_model_filename = train(train_dataset, dev_dataset, vocab, args)
         model = torch.load(max_model_filename)
         emb = torch.load(max_model_filename.replace("model_", "embedding_"))
-        trainer = SentimentTrainer(None, model, emb,
+        trainer = SentimentTrainer(args, model, emb,
                                    criterion=nn.NLLLoss(), optimizer=None)
         loaded_models.append(trainer)
     return loaded_models

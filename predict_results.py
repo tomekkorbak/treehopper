@@ -1,3 +1,4 @@
+import sentiment
 from dataset import SSTDataset
 from ensemble import load_best_models
 from vocab import build_vocab, Vocab
@@ -11,7 +12,9 @@ def predict(models_filename):
     ], 'tmp/vocab_test.txt')
     vocab = Vocab(filename=vocab_file)
     test_dataset = SSTDataset(train_dir, vocab,num_classes=3)
-    model = load_best_models([models_filename])[0]
+    args = sentiment.set_arguments({})
+    model = load_best_models([models_filename], args)[0]
     test_trees = model.predict(test_dataset)
+    return test_trees
 
-predict("models/saved_model14_model_20170731_2209.pth")
+predict("models/saved_model0_model_20170803_2030.pth")
