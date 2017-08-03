@@ -84,7 +84,7 @@ class SentimentTrainer(object):
         for idx in tqdm(range(len(dataset)), desc='Predcting results'):
             tree, sent, _ = dataset[idx]
             input = Var(sent, volatile=True)
-            emb = F.torch.unsqueeze(self.embedding_model(input),1)
+            emb = F.torch.unsqueeze(self.embedding_model(input), 1)
             output, _, acc, tree = self.model(tree, emb)
             output_trees.append(tree)
         return output_trees

@@ -80,15 +80,16 @@ class Tree(object):
     def list_children_in_order(self):
         assert self.parent is None, 'This method should only be called on ' \
                                     'root nodes'
+        tree_list = []
 
         def traverse(tree, tree_list):
             tree_list.append(tree)
             for subtree in tree.children:
-                tree_list.append(subtree)
                 traverse(subtree, tree_list)
             return tree_list
 
-        final_tree_list = traverse(self, [])
+        final_tree_list = traverse(self, tree_list)
+        assert len(final_tree_list) == len(self._viz_sentence)
         return sorted(final_tree_list, key=lambda tree: tree.idx)
 
     def get_predicted_labels(self):
@@ -99,8 +100,8 @@ class Tree(object):
                         for tree in self.list_children_in_order())
 
     def get_output_as_string(self):
-        assert self.output is None, 'No predicted label'
-        return str(torch.max(self.output, 1)[1].data.cpu().numpy()[0][0])
+        assert self.output, 'No predicted label'
+        return str(torch.max(self.output, 1)[1].data.cpu().numpy()[0][0]-1)
 
 
 def get_arcs(tree, arcs_list=None):
