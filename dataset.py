@@ -24,35 +24,51 @@ class SSTDataset(data.Dataset):
 
         self.vocab = vocab
         self.num_classes = num_classes
+        test_trees = None
+        if os.path.isfile(os.path.join(path, 'sklad_sentence.txt')):
+            skladnica_sentences = self.read_sentences(
+                os.path.join(path, 'sklad_sentence.txt')
+            )
+            skladnica_trees = self.read_trees(
+                filename_parents=os.path.join(path, 'sklad_parents.txt'),
+                filename_labels=os.path.join(path, 'sklad_labels.txt'),
+                filename_tokens=os.path.join(path, 'sklad_sentence.txt'),
+                filename_relations=os.path.join(path, 'sklad_rels.txt'),
+            )
+        if os.path.isfile(os.path.join(path, 'rev_sentence.txt')):
+            reviews_sentences = self.read_sentences(
+                os.path.join(path, 'rev_sentence.txt')
+            )
 
-        skladnica_sentences = self.read_sentences(
-            os.path.join(path, 'sklad_sentence.txt')
-        )
-        reviews_sentences = self.read_sentences(
-            os.path.join(path, 'rev_sentence.txt')
-        )
-        self.sentences = skladnica_sentences + reviews_sentences
 
-        skladnica_trees = self.read_trees(
-            filename_parents=os.path.join(path, 'sklad_parents.txt'),
-            filename_labels=os.path.join(path, 'sklad_labels.txt'),
-            filename_tokens=os.path.join(path, 'sklad_sentence.txt'),
-            filename_relations=os.path.join(path, 'sklad_rels.txt'),
-        )
+            reviews_trees = self.read_trees(
+                filename_parents=os.path.join(path, 'rev_parents.txt'),
+                filename_labels=os.path.join(path, 'rev_labels.txt'),
+                filename_tokens=os.path.join(path, 'rev_sentence.txt'),
+                filename_relations=os.path.join(path, 'rev_rels.txt'),
+            )
+        if os.path.isfile(os.path.join(path, 'polevaltest_parents.txt')):
+            test_sentences = self.read_sentences(
+                os.path.join(path, 'polevaltest_sentence.txt')
+            )
+            test_trees = self.read_trees(
+                filename_parents=os.path.join(path, 'polevaltest_parents.txt'),
+                filename_tokens=os.path.join(path, 'polevaltest_sentence.txt'),
+                filename_relations=os.path.join(path, 'polevaltest_rels.txt'),
+                filename_labels = None
+            )
+        if test_trees:
+            self.trees = test_trees
+            self.sentences = test_sentences
+            self.labels = len(self.trees)*[None]
+        else:
+            self.trees = skladnica_trees + reviews_trees  # list concatenation
+            self.sentences = skladnica_sentences + reviews_sentences
+            self.labels = []
 
-        reviews_trees = self.read_trees(
-            filename_parents=os.path.join(path, 'rev_parents.txt'),
-            filename_labels=os.path.join(path, 'rev_labels.txt'),
-            filename_tokens=os.path.join(path, 'rev_sentence.txt'),
-            filename_relations=os.path.join(path, 'rev_rels.txt'),
-        )
-
-        self.trees = skladnica_trees + reviews_trees  # list concatenation
-        self.labels = []
-
-        for i in range(0, len(self.trees)):
-            self.labels.append(self.trees[i].gold_label)
-        self.labels = torch.Tensor(self.labels)  # let labels be tensor
+            for i in range(0, len(self.trees)):
+                self.labels.append(self.trees[i].gold_label)
+            self.labels = torch.Tensor(self.labels)  # let labels be tensor
 
         # shuffle
         self.trees, self.sentences, self.labels = shuffle(self.trees,
@@ -81,13 +97,18 @@ class SSTDataset(data.Dataset):
     def read_trees(self, filename_parents, filename_labels, filename_tokens,
                    filename_relations):
         parents_file = open(filename_parents, 'r', encoding='utf-8')
-        labels_file = open(filename_labels, 'r', encoding='utf-8')
         tokens_file = open(filename_tokens, 'r', encoding='utf-8')
         relations_file = open(filename_relations, 'r', encoding='utf-8')
-        iterator = zip(parents_file.readlines(), labels_file.readlines(),
-                       tokens_file.readlines(), relations_file.readlines())
-        trees = [self.read_tree(parents, labels, tokens, relations)
-                 for parents, labels, tokens, relations in tqdm(iterator)]
+        if filename_labels:
+            labels_file = open(filename_labels, 'r', encoding='utf-8')
+            iterator = zip(parents_file.readlines(), labels_file.readlines(),
+                           tokens_file.readlines(), relations_file.readlines())
+            trees = [self.read_tree(parents, labels, tokens, relations)
+                     for parents, labels, tokens, relations in tqdm(iterator)]
+        else:
+            iterator = zip(parents_file.readlines(),tokens_file.readlines(), relations_file.readlines())
+            trees = [self.read_tree(parents, None, tokens, relations)
+                     for parents, tokens, relations in tqdm(iterator)]
 
         return trees
 
@@ -96,7 +117,10 @@ class SSTDataset(data.Dataset):
 
     def read_tree(self, line_parents, line_label, line_words, line_relations):
         parents = list(map(int, line_parents.split()))
-        labels = list(map(self.parse_label, line_label.split()))
+        if line_label:
+            labels = list(map(self.parse_label, line_label.split()))
+        else:
+            labels = None
         words = line_words.split()
         relations = line_relations.split()
         trees = dict()
@@ -113,7 +137,10 @@ class SSTDataset(data.Dataset):
                         tree.add_child(prev)
                     trees[idx] = tree
                     tree.idx = idx
-                    tree.gold_label = labels[idx-1]
+                    if labels:
+                        tree.gold_label = labels[idx-1]
+                    else:
+                        tree.gold_label = None
                     tree.word = words[idx-1]
                     tree.relation = relations[idx-1]
                     if parent in trees.keys():

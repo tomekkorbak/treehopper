@@ -76,3 +76,15 @@ class SentimentTrainer(object):
             outputs.append(tree.output_softmax.data.numpy())
             # predictions[idx] = torch.dot(indices,torch.exp(output.data.cpu()))
         return loss/len(dataset), accuracies, outputs, output_trees
+
+    def predict(self, dataset):
+        self.model.eval()
+        self.embedding_model.eval()
+        output_trees = []
+        for idx in tqdm(range(len(dataset)), desc='Testing epoch  '+str(self.epoch)+''):
+            tree, sent, _ = dataset[idx]
+            input = Var(sent, volatile=True)
+            emb = F.torch.unsqueeze(self.embedding_model(input),1)
+            output, _, acc, tree = self.model(tree, emb)
+            output_trees.append(tree)
+        return output_trees

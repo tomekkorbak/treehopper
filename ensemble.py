@@ -14,24 +14,9 @@ from vocab import Vocab, build_vocab
 import numpy as np
 
 
-def test_acc(all_outputs,test_dataset, type):
-    ensemble_output = []
-    all_outputs = zip(*all_outputs)
-    for elem in all_outputs:
-        elem = np.asarray(elem)
-        if type == "vote":
-            max_elems = np.argmax(elem, axis=2)
-            output = np.argmax(np.bincount(np.reshape(max_elems, len(max_elems))))
-        else:
-            avg_elems = np.mean(elem, axis=1)
-            output = np.argmax(avg_elems)
-        ensemble_output.append(output)
-    return accuracy_score(test_dataset.labels, ensemble_output)
-
 
 def ensemble_train():
-    type = "avg"
-    train = True
+    train = False
 
     args = sentiment.set_arguments({})
     models_filenames = ["models/saved_model14_model_20170731_2027.pth",
@@ -44,13 +29,21 @@ def ensemble_train():
         'training-treebank/sklad_sentence.txt'
     ], 'vocab.txt')
     vocab = Vocab(filename=vocab_file)
-    dataset = SSTDataset(train_dir, vocab, args.num_classes)
+    full_dataset = SSTDataset(train_dir, vocab, args.num_classes)
+
+
+    if args.create_test != 0:
+        split_point = int(len(full_dataset) * (args.create_test))
+        test_dataset = SSTDataset(num_classes=args.num_classes)
+        test_dataset.trees, full_dataset.trees = full_dataset.trees[:split_point], full_dataset.trees[split_point:]
+        test_dataset.sentences, full_dataset.sentences = full_dataset.sentences[:split_point], full_dataset.sentences[
+                                                                                               split_point:]
+        test_dataset.labels, full_dataset.labels = full_dataset.labels[:split_point], full_dataset.labels[split_point:]
 
     train_dataset, dev_dataset = SSTDataset(num_classes=args.num_classes), SSTDataset(num_classes=args.num_classes)
-    test_dataset = SSTDataset(num_classes=args.num_classes)
 
-    train_dataset, dev_dataset, test_dataset = split_dataset_simple(dataset, train_dataset, dev_dataset,
-                                                                    test_dataset, args.split[1])
+    train_dataset, dev_dataset = split_dataset_simple(full_dataset, train_dataset, dev_dataset,
+                                                                    args.split[1])
 
     if train:
         models = train_and_load_models(train_dataset, dev_dataset, vocab)
@@ -65,21 +58,11 @@ def ensemble_train():
         all_outputs.append(test_output)
         all_trees.append(test_trees)
 
-        # _, _, dev_output, dev_trees = model.test(dev_dataset)
-        # all_dev_outputs.append(dev_output)
-
     all_trees = zip(*all_trees)
     accuracies  = []
     for i in all_trees:
         accuracies.append(compute_accuracy_for_ensemble(i))
     print(np.mean(np.asarray(accuracies)))
-    # accuracy = test_acc(all_outputs,test_dataset, type)
-    # print("Test")
-    # print(accuracy)
-    #
-    # accuracy = test_acc(all_dev_outputs,dev_dataset, type)
-    # print("Dev")
-    # print(accuracy)
 
 def compute_accuracy_for_ensemble(list_trees):
 
