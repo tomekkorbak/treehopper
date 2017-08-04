@@ -28,5 +28,5 @@ def save_submission(predictions):
     print('Good luck!')
 
 
-predictions = predict("models/saved_model24_model_20170803_1608.pth")
+predictions = predict("models/1model_20170804_1851.pth")
 save_submission(predictions)

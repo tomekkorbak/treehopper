@@ -71,9 +71,9 @@ class SSTDataset(data.Dataset):
             self.labels = torch.Tensor(self.labels)  # let labels be tensor
 
         # shuffle
-        self.trees, self.sentences, self.labels = shuffle(self.trees,
-                                                          self.sentences,
-                                                          self.labels)
+            self.trees, self.sentences, self.labels = shuffle(self.trees,
+                                                              self.sentences,
+                                                              self.labels)
 
     def __len__(self):
         return len(self.trees)

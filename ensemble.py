@@ -14,14 +14,69 @@ from vocab import Vocab, build_vocab
 import numpy as np
 
 
+def test_ensemble(models, test_dataset):
+    all_outputs = []
+    all_trees = []
+    for model in models:
+        _, _, test_output, test_trees = model.test(test_dataset)
+        all_outputs.append(test_output)
+        all_trees.append(test_trees)
+
+    all_trees = zip(*all_trees)
+    accuracies = []
+    for i in all_trees:
+        accuracies.append(compute_accuracy_for_ensemble(i))
+    print(np.mean(np.asarray(accuracies)))
+
+def get_output_as_string(trees):
+    out = np.asarray([np.reshape(x.output.data.numpy(), 3) for x in trees])
+    avg_elems = np.mean(out, axis=0)
+    output = np.argmax(avg_elems)
+    return str(output)
+
+def get_predicted_labels(trees):
+    ordered_trees = []
+    for tree in trees:
+        assert tree.parent is None, 'This method should only be called on ' \
+                                    'root nodes'
+        ordered_trees.append(tree.list_children_in_order())
+    ordered_trees = zip(*ordered_trees)
+    outputs = []
+    for trees in ordered_trees:
+        outputs.append(get_output_as_string(trees))
+    return outputs
+
+    # return ' '.join(tree.
+    #                 for tree in tree.list_children_in_order())
+
+
+def predict_ensemble(models):
+
+    train_dir = 'test'
+    vocab_file = 'tmp/vocab_test.txt'
+    build_vocab([
+        'test/polevaltest_sentence.txt',
+    ], 'tmp/vocab_test.txt')
+    vocab = Vocab(filename=vocab_file)
+    test_dataset = SSTDataset(train_dir, vocab, num_classes=3)
+
+    all_trees = []
+    for model in models:
+        test_trees = model.predict(test_dataset)
+        all_trees.append(test_trees)
+
+    all_trees = zip(*all_trees)
+    filename = 'submission_{date:%Y%m%d_%H%M}.txt'.format(date=datetime.now())
+    with open(filename, 'w') as submission_file:
+        for sentence in all_trees:
+            submission_file.write(' '.join(get_predicted_labels(sentence)) + '\n')
+    print('Good luck!')
 
 def ensemble_train():
     train = False
 
     args = sentiment.set_arguments({})
-    models_filenames = ["models/saved_model0_model_20170803_2030.pth",
-                        "models/saved_model1_model_20170803_2030.pth"
-                        ]
+    models_filenames = ["models/1model_20170804_1851.pth"]
     train_dir = 'training-treebank'
     vocab_file = 'vocab.txt'
     build_vocab([
@@ -50,19 +105,11 @@ def ensemble_train():
     else:
         models = load_best_models(models_filenames, args)
 
-    all_outputs = []
-    all_trees = []
-    all_dev_outputs = []
-    for model in models:
-        _, _, test_output, test_trees = model.test(test_dataset)
-        all_outputs.append(test_output)
-        all_trees.append(test_trees)
 
-    all_trees = zip(*all_trees)
-    accuracies = []
-    for i in all_trees:
-        accuracies.append(compute_accuracy_for_ensemble(i))
-    print(np.mean(np.asarray(accuracies)))
+    test_ensemble(models, test_dataset)
+
+    predict_ensemble(models)
+
 
 def compute_accuracy_for_ensemble(list_trees):
 
