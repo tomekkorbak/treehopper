@@ -31,7 +31,7 @@ def test_ensemble(models, test_dataset):
 def get_output_as_string(trees):
     out = np.asarray([np.reshape(x.output.data.numpy(), 3) for x in trees])
     avg_elems = np.mean(out, axis=0)
-    output = np.argmax(avg_elems)
+    output = np.argmax(avg_elems) - 1
     return str(output)
 
 def get_predicted_labels(trees):
