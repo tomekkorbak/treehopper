@@ -12,15 +12,16 @@ def grid_search():
         ("data/pol/fasttext", "wiki.pl")
     ]
     # param_grid["optim"] = ["adam", "adagrad"]
-    # param_grid["wd"] = [0, 1e-5]
+    param_grid["wd"] = [0]
     # param_grid['reweight'] = [True, False]
     param_grid['mem_dim'] = [300, 400]
-    param_grid['recurrent_dropout_h'] = [0.005, 0.025, 0.05]
-    param_grid['recurrent_dropout_c'] = [0.15, 0.25, 0.35]
-    param_grid['zoneout_choose_child'] = [True, False]
-    param_grid['common_mask'] = [True, False]
-    # param_grid['emblr'] = [0.01, 0.1, 0.2]
-    param_grid['name'] = ['{date:%Y%m%d_%H%M}'.format(date=datetime.now())]
+    param_grid['recurrent_dropout_h'] = [0.001]
+    param_grid['recurrent_dropout_c'] = [0.1]
+    param_grid['zoneout_choose_child'] = [True]
+    param_grid['common_mask'] = [True]
+    param_grid['folds'] = [5]
+    param_grid['emblr'] = [0.2]
+    # param_grid['name'] = ['{date:%Y%m%d_%H%M}'.format(date=datetime.now())]
     grid = ParameterGrid(param_grid)
 
     filename = "{date:%Y%m%d_%H%M}_results.csv".format(date=datetime.now())

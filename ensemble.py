@@ -66,7 +66,7 @@ def predict_ensemble(models):
         all_trees.append(test_trees)
 
     all_trees = zip(*all_trees)
-    filename = 'submission_{date:%Y%m%d_%H%M}.txt'.format(date=datetime.now())
+    filename = 'finals/submission_ens.txt'.format(date=datetime.now())
     with open(filename, 'w') as submission_file:
         for sentence in all_trees:
             submission_file.write(' '.join(get_predicted_labels(sentence)) + '\n')
@@ -76,7 +76,9 @@ def ensemble_train():
     train = False
 
     args = sentiment.set_arguments({})
-    models_filenames = ["models/1model_20170804_1851.pth"]
+    models_filenames = ['finals/ensemble/10_model_.pth',
+                        'finals/ensemble/15_model_.pth',
+                        'finals/ensemble/19_model_.pth']
     train_dir = 'training-treebank'
     vocab_file = 'vocab.txt'
     build_vocab([
@@ -106,7 +108,7 @@ def ensemble_train():
         models = load_best_models(models_filenames, args)
 
 
-    test_ensemble(models, test_dataset)
+    #test_ensemble(models, test_dataset)
 
     predict_ensemble(models)
 

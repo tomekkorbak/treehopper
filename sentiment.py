@@ -34,6 +34,8 @@ def set_arguments(grid_args):
         args.recurrent_dropout = grid_args['zoneout_choose_child']
     if 'emblr' in grid_args:
         args.emblr = grid_args['emblr']
+    if 'folds' in grid_args:
+        args.folds = grid_args['folds']
     args.calculate_new_words = True
     dim_from_file = re.search("((\d+)d$)|((\d+)$)", args.emb_file)
     args.input_dim = int(dim_from_file.group(0)) if dim_from_file else 300
@@ -99,7 +101,7 @@ def main(grid_args={}):
         max_dev_epoch, max_dev = np.mean(all_dev_epoch), np.mean(all_dev)
 
     with open(args.name + '_results', 'a') as result_file:
-        result_file.write('Epoch {epoch}, accuracy {acc:.4f}\n'.format(
+        result_file.write(str(args) + '\nEpoch {epoch}, accuracy {acc:.4f}\n'.format(
             epoch=max_dev_epoch,
             acc=max_dev
         ))

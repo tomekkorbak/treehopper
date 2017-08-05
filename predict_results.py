@@ -21,12 +21,15 @@ def predict(models_filename):
 
 
 def save_submission(predictions):
-    filename = 'submission_{date:%Y%m%d_%H%M}.txt'.format(date=datetime.now())
+    filename = 'finals/submission_fast_emblr.txt'.format(date=datetime.now())
     with open(filename, 'w') as submission_file:
         for sentence in predictions:
             submission_file.write(sentence.get_predicted_labels() + '\n')
     print('Good luck!')
 
-
-predictions = predict("models/1model_20170804_1851.pth")
+#
+predictions = predict('finals/1model_20170804_1851.pth')
 save_submission(predictions)
+
+#predictions = predict('finals/2saved_model22_model_20170804_2312.pth')
+#save_submission(predictions)
