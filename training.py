@@ -40,9 +40,10 @@ def train(train_dataset, dev_dataset, vocab, args):
 
     # create trainer object for training and testing
     trainer = SentimentTrainer(args, model, embedding_model ,criterion, optimizer)
-    experiment_dir = os.path.join(os.getcwd(), args.saved, args.name)
+    experiment_dir = os.path.join(os.getcwd(), args.saved, "models_" + args.name)
     if not os.path.exists(experiment_dir):
         os.makedirs(experiment_dir)
+        open(experiment_dir+"/"+"config.txt", "w+").write(str(args))
     max_dev = 0
     max_dev_epoch = 0
     for epoch in range(args.epochs):
@@ -51,8 +52,8 @@ def train(train_dataset, dev_dataset, vocab, args):
         dev_acc = torch.mean(dev_acc)
         print('==> Train loss   : %f \t' % train_loss, end="")
         print('Epoch ', epoch, 'dev percentage ', dev_acc)
-        model_filename = experiment_dir + '/' + str(epoch) + '_model' + '.pth'
-        emb_filename = experiment_dir + '/' + str(epoch) + '_embedding' + '.pth'
+        model_filename = experiment_dir + '/' +'model_' + str(epoch) + '.pth'
+        emb_filename = experiment_dir + '/' + 'embedding_' + str(epoch) +  '.pth'
         torch.save(model, model_filename)
         torch.save(embedding_model, emb_filename)
         if dev_acc > max_dev:

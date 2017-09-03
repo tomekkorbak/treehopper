@@ -69,7 +69,7 @@ class Tree(object):
             """
             if accuracies is None:
                 accuracies = []
-            accuracies.append(1 if torch.max(tree.output, 1)[1].data.cpu().numpy()[0][0] == tree.gold_label else 0)
+            accuracies.append(1 if torch.max(tree.output, 1,keepdim=True)[1].data.cpu().numpy()[0] == tree.gold_label else 0)
             for subtree in tree.children:
                 _compute_accuracy(subtree, accuracies)
             return accuracies

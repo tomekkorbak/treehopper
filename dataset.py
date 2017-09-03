@@ -55,12 +55,15 @@ class SSTDataset(data.Dataset):
                 filename_parents=os.path.join(path, 'polevaltest_parents.txt'),
                 filename_tokens=os.path.join(path, 'polevaltest_sentence.txt'),
                 filename_relations=os.path.join(path, 'polevaltest_rels.txt'),
-                filename_labels = None
+                filename_labels = os.path.join(path, 'polevaltest_labels.txt')
             )
         if test_trees:
             self.trees = test_trees
             self.sentences = test_sentences
-            self.labels = len(self.trees)*[None]
+            self.labels = []
+            for i in range(0, len(self.trees)):
+                self.labels.append(self.trees[i].gold_label)
+            self.labels = torch.Tensor(self.labels)
         else:
             self.trees = skladnica_trees + reviews_trees  # list concatenation
             self.sentences = skladnica_sentences + reviews_sentences
@@ -68,13 +71,13 @@ class SSTDataset(data.Dataset):
 
             for i in range(0, len(self.trees)):
                 self.labels.append(self.trees[i].gold_label)
-            self.labels = torch.Tensor(self.labels)  # let labels be tensor
+            # self.labels = torch.Tensor(self.labels)  # let labels be tensor
 
         # shuffle
             self.trees, self.sentences, self.labels = shuffle(self.trees,
                                                               self.sentences,
                                                               self.labels)
-
+            self.labels = torch.Tensor(self.labels)
     def __len__(self):
         return len(self.trees)
 

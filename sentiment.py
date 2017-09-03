@@ -11,6 +11,7 @@ from dataset import SSTDataset
 from config import parse_args
 
 
+
 def set_arguments(grid_args):
     args = parse_args()
     if "embeddings" in grid_args:
@@ -60,13 +61,23 @@ def main(grid_args={}):
     vocab = Vocab(filename=vocab_file)
     full_dataset = SSTDataset(train_dir, vocab, args.num_classes)
 
+    # if args.create_test != 0:
+    #     split_point = int(len(full_dataset) * (args.create_test))
+    #     test_dataset = SSTDataset(num_classes=args.num_classes)
+    #     test_dataset.trees, full_dataset.trees = full_dataset.trees[:split_point], full_dataset.trees[split_point:]
+    #     test_dataset.sentences, full_dataset.sentences = full_dataset.sentences[:split_point], full_dataset.sentences[
+    #                                                                                            split_point:]
+    #     test_dataset.labels, full_dataset.labels = full_dataset.labels[:split_point], full_dataset.labels[split_point:]
+    # full_dataset = SSTDataset(train_dir, vocab, args.num_classes)
+
     if args.create_test != 0:
-        split_point = int(len(full_dataset) * (args.create_test))
-        test_dataset = SSTDataset(num_classes=args.num_classes)
-        test_dataset.trees, full_dataset.trees = full_dataset.trees[:split_point], full_dataset.trees[split_point:]
-        test_dataset.sentences, full_dataset.sentences = full_dataset.sentences[:split_point], full_dataset.sentences[
-                                                                                               split_point:]
-        test_dataset.labels, full_dataset.labels = full_dataset.labels[:split_point], full_dataset.labels[split_point:]
+        test_dir = 'test'
+        vocab_file_test = 'tmp/vocab_test.txt'
+        build_vocab([
+            'test/polevaltest_sentence.txt',
+        ], 'tmp/vocab_test.txt')
+        vocab_test = Vocab(filename=vocab_file_test)
+        test_dataset = SSTDataset(test_dir, vocab_test, num_classes=3)
 
 
     train_dataset = SSTDataset(num_classes=args.num_classes)

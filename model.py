@@ -33,7 +33,7 @@ class ChildSumTreeLSTM(nn.Module):
         self.output_module = output_module
 
     def node_forward(self, inputs, child_c, child_h, training):
-        child_h_sum = F.torch.sum(torch.squeeze(child_h, 1), 0)
+        child_h_sum = F.torch.sum(torch.squeeze(child_h, 1), 0, keepdim = True)
 
         i = F.sigmoid(self.ix(inputs)+self.ih(child_h_sum))
         o = F.sigmoid(self.ox(inputs)+self.oh(child_h_sum))
@@ -41,7 +41,8 @@ class ChildSumTreeLSTM(nn.Module):
 
         # add extra singleton dimension
         fx = F.torch.unsqueeze(self.fx(inputs), 1)
-        f = F.torch.cat([self.fh(child_hi) + fx for child_hi in child_h], 0)
+        f = F.torch.cat([self.fh(child_hi) + torch.squeeze(fx, 1) for child_hi in child_h], 0)
+        # f = torch.squeeze(f, 0)
         f = F.sigmoid(f)
         # removing extra singleton dimension
         f = F.torch.unsqueeze(f, 1)
@@ -52,8 +53,8 @@ class ChildSumTreeLSTM(nn.Module):
             idx = idx.cuda()
 
         c = zoneout(
-            current_input=F.torch.mul(i, u) + F.torch.sum(fc, 0),
-            previous_input=F.torch.squeeze(child_c.index_select(0, idx), 0) if self.zoneout_choose_child else F.torch.sum(torch.squeeze(child_c, 1), 0),
+            current_input=F.torch.mul(i, u) + F.torch.sum(fc, 0, keepdim=True),
+            previous_input=F.torch.squeeze(child_c.index_select(0, idx), 0) if self.zoneout_choose_child else F.torch.sum(torch.squeeze(child_c, 1), 0, keepdim=True),
             p=self.recurrent_dropout_c,
             training=training,
             mask=self.mask if self.commons_mask else None
