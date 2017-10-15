@@ -10,106 +10,82 @@ from vocab import Vocab, build_vocab
 from dataset import SSTDataset
 from config import parse_args
 
-
-
 def set_arguments(grid_args):
     args = parse_args()
-    if "embeddings" in grid_args:
-        args.emb_dir = grid_args["embeddings"][0]
-        args.emb_file = grid_args["embeddings"][1]
-    if "optim" in grid_args:
-        args.optim = grid_args["optim"]
-    if "wd" in grid_args:
-        args.wd = grid_args["wd"]
-    if "mem_dim" in grid_args:
-        args.mem_dim = grid_args['mem_dim']
-    if 'recurrent_dropout_c' in grid_args:
-        args.recurrent_dropout = grid_args['recurrent_dropout_c']
-    if 'recurrent_dropout_h' in grid_args:
-        args.recurrent_dropout = grid_args['recurrent_dropout_h']
-    if 'zoneout_strategy' in grid_args:
-        args.recurrent_dropout = grid_args['zoneout_strategy']
-    if 'common_mask' in grid_args:
-        args.recurrent_dropout = grid_args['common_mask']
-    if 'zoneout_choose_child' in grid_args:
-        args.recurrent_dropout = grid_args['zoneout_choose_child']
-    if 'emblr' in grid_args:
-        args.emblr = grid_args['emblr']
-    if 'folds' in grid_args:
-        args.folds = grid_args['folds']
-    args.calculate_new_words = True
-    dim_from_file = re.search("((\d+)d$)|((\d+)$)", args.emb_file)
+    if grid_args !=None:
+        if "embeddings" in grid_args:
+            args.emb_dir = grid_args["embeddings"][0]
+            args.emb_file = grid_args["embeddings"][1]
+        for key, val in grid_args.items():
+            setattr(args,key,val)
+        args.calculate_new_words = True
+
+    embedding_dim = "((\d+)d$)|((\d+)$)"
+    dim_from_file = re.search(embedding_dim, args.emb_file)
     args.input_dim = int(dim_from_file.group(0)) if dim_from_file else 300
     args.num_classes = 3  # -1 0 1
+
     args.cuda = args.cuda and torch.cuda.is_available()
+
     args.split = ('simple', 0.1) if args.folds == 1 else ('kfold', args.folds)
-    args.create_test = 0.1 # if 0.0 test set won't be created
+    args.test = True #
     #("simple",(dev_size,test_size)),("random",size_of_dev),("kfold", number_of_folds)
     print(args)
     return args
 
 
-def main(grid_args={}):
-    args = set_arguments(grid_args)
-
+def create_train_dataset(args):
     train_dir = 'training-treebank'
     vocab_file = 'tmp/vocab.txt'
     build_vocab([
         'training-treebank/rev_sentence.txt',
-        'training-treebank/sklad_sentence.txt'
+        'training-treebank/sklad_sentence.txt',
+        'test/polevaltest_sentence.txt'
     ], 'tmp/vocab.txt')
     vocab = Vocab(filename=vocab_file)
     full_dataset = SSTDataset(train_dir, vocab, args.num_classes)
+    return vocab, full_dataset
 
-    # if args.create_test != 0:
-    #     split_point = int(len(full_dataset) * (args.create_test))
-    #     test_dataset = SSTDataset(num_classes=args.num_classes)
-    #     test_dataset.trees, full_dataset.trees = full_dataset.trees[:split_point], full_dataset.trees[split_point:]
-    #     test_dataset.sentences, full_dataset.sentences = full_dataset.sentences[:split_point], full_dataset.sentences[
-    #                                                                                            split_point:]
-    #     test_dataset.labels, full_dataset.labels = full_dataset.labels[:split_point], full_dataset.labels[split_point:]
-    # full_dataset = SSTDataset(train_dir, vocab, args.num_classes)
 
-    if args.create_test != 0:
+def main(grid_args = None):
+    args = set_arguments(grid_args)
+    vocab, full_dataset = create_train_dataset(args)
+
+    if args.test:
         test_dir = 'test'
-        vocab_file_test = 'tmp/vocab_test.txt'
-        build_vocab([
-            'test/polevaltest_sentence.txt',
-        ], 'tmp/vocab_test.txt')
-        vocab_test = Vocab(filename=vocab_file_test)
-        test_dataset = SSTDataset(test_dir, vocab_test, num_classes=3)
-
-
-    train_dataset = SSTDataset(num_classes=args.num_classes)
-
-    dev_dataset   = SSTDataset(num_classes=args.num_classes)
-
-    if args.split[0] == "simple":
-        train_dataset, dev_dataset = split_dataset_simple(
-            full_dataset,
-            train_dataset,
-            dev_dataset,
-            split=args.split[1]
-        )
-        max_dev_epoch, max_dev, _ = train(train_dataset, dev_dataset, vocab, args)
-    elif args.split[0] == "random":
-        train_dataset, dev_dataset = split_dataset_random(
-            full_dataset,
-            train_dataset,
-            dev_dataset,
-            test_size=args.split[1]
-        )
-        max_dev_epoch, max_dev, _ = train(train_dataset, dev_dataset, vocab, args)
+        test_dataset = SSTDataset(test_dir, vocab, args.num_classes)
+        max_dev_epoch, max_dev, _ = train(full_dataset, test_dataset, vocab, args)
     else:
-        all_dev_epoch, all_dev = kfold_training(
-            full_dataset,
-            vocab,
-            args.split[1],
-            train_dataset,
-            dev_dataset,
-            args
-        )
-        max_dev_epoch, max_dev = np.mean(all_dev_epoch), np.mean(all_dev)
+
+        train_dataset = SSTDataset(num_classes=args.num_classes)
+        dev_dataset   = SSTDataset(num_classes=args.num_classes)
+
+        if args.split[0] == "simple":
+            train_dataset, dev_dataset = split_dataset_simple(
+                full_dataset,
+                train_dataset,
+                dev_dataset,
+                split=args.split[1]
+            )
+            max_dev_epoch, max_dev, _ = train(train_dataset, dev_dataset, vocab, args)
+        elif args.split[0] == "random":
+            train_dataset, dev_dataset = split_dataset_random(
+                full_dataset,
+                train_dataset,
+                dev_dataset,
+                test_size=args.split[1]
+            )
+            max_dev_epoch, max_dev, _ = train(train_dataset, dev_dataset, vocab, args)
+        else:
+            all_dev_epoch, all_dev = kfold_training(
+                full_dataset,
+                vocab,
+                args.split[1],
+                train_dataset,
+                dev_dataset,
+                args
+            )
+            max_dev_epoch, max_dev = np.mean(all_dev_epoch), np.mean(all_dev)
 
     with open(args.name + '_results', 'a') as result_file:
         result_file.write(str(args) + '\nEpoch {epoch}, accuracy {acc:.4f}\n'.format(

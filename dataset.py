@@ -15,6 +15,7 @@ class SSTDataset(data.Dataset):
     A wrapper class for dataset in the format of Stanford Sentiment Treebank 
     (SST) (https://nlp.stanford.edu/sentiment/)
     """
+
     def __init__(self, path=None, vocab=None, num_classes=None):
         super(SSTDataset, self).__init__()
 
@@ -24,46 +25,18 @@ class SSTDataset(data.Dataset):
 
         self.vocab = vocab
         self.num_classes = num_classes
-        test_trees = None
-        if os.path.isfile(os.path.join(path, 'sklad_sentence.txt')):
-            skladnica_sentences = self.read_sentences(
-                os.path.join(path, 'sklad_sentence.txt')
-            )
-            skladnica_trees = self.read_trees(
-                filename_parents=os.path.join(path, 'sklad_parents.txt'),
-                filename_labels=os.path.join(path, 'sklad_labels.txt'),
-                filename_tokens=os.path.join(path, 'sklad_sentence.txt'),
-                filename_relations=os.path.join(path, 'sklad_rels.txt'),
-            )
-        if os.path.isfile(os.path.join(path, 'rev_sentence.txt')):
-            reviews_sentences = self.read_sentences(
-                os.path.join(path, 'rev_sentence.txt')
-            )
+        skladnica_sentences, skladnica_trees = self.create_trees(path, 'sklad')
 
+        reviews_sentences, reviews_trees = self.create_trees(path, 'rev')
 
-            reviews_trees = self.read_trees(
-                filename_parents=os.path.join(path, 'rev_parents.txt'),
-                filename_labels=os.path.join(path, 'rev_labels.txt'),
-                filename_tokens=os.path.join(path, 'rev_sentence.txt'),
-                filename_relations=os.path.join(path, 'rev_rels.txt'),
-            )
-        if os.path.isfile(os.path.join(path, 'polevaltest_parents.txt')):
-            test_sentences = self.read_sentences(
-                os.path.join(path, 'polevaltest_sentence.txt')
-            )
-            test_trees = self.read_trees(
-                filename_parents=os.path.join(path, 'polevaltest_parents.txt'),
-                filename_tokens=os.path.join(path, 'polevaltest_sentence.txt'),
-                filename_relations=os.path.join(path, 'polevaltest_rels.txt'),
-                filename_labels = os.path.join(path, 'polevaltest_labels.txt')
-            )
+        test_sentences, test_trees = self.create_trees(path, 'polevaltest')
+
         if test_trees:
             self.trees = test_trees
             self.sentences = test_sentences
             self.labels = []
             for i in range(0, len(self.trees)):
                 self.labels.append(self.trees[i].gold_label)
-            self.labels = torch.Tensor(self.labels)
         else:
             self.trees = skladnica_trees + reviews_trees  # list concatenation
             self.sentences = skladnica_sentences + reviews_sentences
@@ -71,13 +44,14 @@ class SSTDataset(data.Dataset):
 
             for i in range(0, len(self.trees)):
                 self.labels.append(self.trees[i].gold_label)
-            # self.labels = torch.Tensor(self.labels)  # let labels be tensor
 
-        # shuffle
+                # shuffle
             self.trees, self.sentences, self.labels = shuffle(self.trees,
                                                               self.sentences,
                                                               self.labels)
-            self.labels = torch.Tensor(self.labels)
+
+        self.labels = torch.Tensor(self.labels)  # let labels be tensor
+
     def __len__(self):
         return len(self.trees)
 
@@ -86,6 +60,21 @@ class SSTDataset(data.Dataset):
         sent = deepcopy(self.sentences[index])
         label = deepcopy(self.labels[index])
         return tree, sent, label
+
+    def create_trees(self, path, file_type):
+        if os.path.isfile(os.path.join(path, file_type + '_sentence.txt')):
+            sentences = self.read_sentences(
+                os.path.join(path, file_type + '_sentence.txt')
+            )
+            trees = self.read_trees(
+                filename_parents=os.path.join(path, file_type + '_parents.txt'),
+                filename_labels=os.path.join(path, file_type + '_labels.txt'),
+                filename_tokens=os.path.join(path, file_type + '_sentence.txt'),
+                filename_relations=os.path.join(path, file_type + '_rels.txt'),
+            )
+            return sentences, trees
+        else:
+            return None, None
 
     def read_sentences(self, filename):
         with open(filename, 'r', encoding='utf-8') as f:
@@ -109,7 +98,7 @@ class SSTDataset(data.Dataset):
             trees = [self.read_tree(parents, labels, tokens, relations)
                      for parents, labels, tokens, relations in tqdm(iterator)]
         else:
-            iterator = zip(parents_file.readlines(),tokens_file.readlines(), relations_file.readlines())
+            iterator = zip(parents_file.readlines(), tokens_file.readlines(), relations_file.readlines())
             trees = [self.read_tree(parents, None, tokens, relations)
                      for parents, tokens, relations in tqdm(iterator)]
 
@@ -129,23 +118,23 @@ class SSTDataset(data.Dataset):
         trees = dict()
         root = None
 
-        for i in range(1, len(parents)+1):
+        for i in range(1, len(parents) + 1):
             if i not in trees.keys():
                 idx = i
                 prev = None
                 while True:
-                    parent = parents[idx-1]
+                    parent = parents[idx - 1]
                     tree = Tree()
                     if prev:
                         tree.add_child(prev)
                     trees[idx] = tree
                     tree.idx = idx
                     if labels:
-                        tree.gold_label = labels[idx-1]
+                        tree.gold_label = labels[idx - 1]
                     else:
                         tree.gold_label = None
-                    tree.word = words[idx-1]
-                    tree.relation = relations[idx-1]
+                    tree.word = words[idx - 1]
+                    tree.relation = relations[idx - 1]
                     if parent in trees.keys():
                         trees[parent].add_child(tree)
                         break
