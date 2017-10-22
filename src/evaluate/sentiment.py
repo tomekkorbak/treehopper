@@ -4,10 +4,10 @@ import numpy as np
 import torch
 from sklearn.model_selection import KFold
 from src.config import parse_args
-from src.data.dataset import SSTDataset
-from src.data.split_datasets import split_dataset_simple, split_dataset_random, split_dataset_kfold
-from src.data.vocab import build_vocab, Vocab
-from src.models.training import train
+from src.datas.dataset import SSTDataset
+from src.datas.split_datasets import split_dataset_simple, split_dataset_random, split_dataset_kfold
+from src.datas.vocab import build_vocab, Vocab
+from src.model.training import train
 
 
 def set_arguments(grid_args):
@@ -28,13 +28,13 @@ def set_arguments(grid_args):
     args.cuda = args.cuda and torch.cuda.is_available()
 
     args.split = ('simple', 0.1) if args.folds == 1 else ('kfold', args.folds)
-    args.test = True #
+    args.test = False #
     #("simple",(dev_size,test_size)),("random",size_of_dev),("kfold", number_of_folds)
     print(args)
     return args
 
 
-def create_train_dataset(args):
+def create_full_dataset(args):
     train_dir = 'training-treebank'
     vocab_file = 'tmp/vocab.txt'
     build_vocab([
@@ -49,7 +49,7 @@ def create_train_dataset(args):
 
 def main(grid_args = None):
     args = set_arguments(grid_args)
-    vocab, full_dataset = create_train_dataset(args)
+    vocab, full_dataset = create_full_dataset(args)
 
     if args.test:
         test_dir = 'test'
