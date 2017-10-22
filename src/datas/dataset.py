@@ -45,9 +45,9 @@ class SSTDataset(data.Dataset):
                 self.labels.append(self.trees[i].gold_label)
 
                 # shuffle
-            self.trees, self.sentences, self.labels = shuffle(self.trees,
-                                                              self.sentences,
-                                                              self.labels)
+            # self.trees, self.sentences, self.labels = shuffle(self.trees,
+            #                                                   self.sentences,
+            #                                                   self.labels)
 
         self.labels = torch.Tensor(self.labels)  # let labels be tensor
 

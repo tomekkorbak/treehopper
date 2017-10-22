@@ -18,7 +18,7 @@ def set_arguments(grid_args):
             args.emb_file = grid_args["embeddings"][1]
         for key, val in grid_args.items():
             setattr(args,key,val)
-        args.calculate_new_words = True
+    args.calculate_new_words = True
 
     embedding_dim = "((\d+)d$)|((\d+)$)"
     dim_from_file = re.search(embedding_dim, args.emb_file)
