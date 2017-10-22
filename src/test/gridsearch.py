@@ -1,7 +1,8 @@
 from datetime import datetime
 
 from sklearn.model_selection import ParameterGrid
-from src.evaluate import sentiment
+
+from src import sentiment
 
 
 def grid_search():
@@ -24,7 +25,7 @@ def grid_search():
     # param_grid['name'] = ['{date:%Y%m%d_%H%M}'.format(date=datetime.now())]
     grid = ParameterGrid(param_grid)
 
-    filename = "results/{date:%Y%m%d_%H%M}_results.csv".format(date=datetime.now())
+    filename = "{date:%Y%m%d_%H%M}_results.csv".format(date=datetime.now())
     print('Starting a grid search through {n} parameter combinations'.format(
         n=len(grid)))
     for params in grid:

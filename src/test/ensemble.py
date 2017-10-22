@@ -6,9 +6,10 @@ from dataset import SSTDataset
 from sentiment_trainer import SentimentTrainer
 from sklearn.model_selection import ParameterGrid
 from split_datasets import split_dataset_simple
-from src.models.training import train, torch
 from torch import nn
 from vocab import Vocab, build_vocab
+
+from src.training import train, torch
 
 
 def test_ensemble(models, test_dataset):
