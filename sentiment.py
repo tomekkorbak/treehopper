@@ -34,7 +34,7 @@ def set_arguments(grid_args):
     return args
 
 
-def create_train_dataset(args):
+def create_full_dataset(args):
     train_dir = 'training-treebank'
     vocab_file = 'tmp/vocab.txt'
     build_vocab([
@@ -49,7 +49,7 @@ def create_train_dataset(args):
 
 def main(grid_args = None):
     args = set_arguments(grid_args)
-    vocab, full_dataset = create_train_dataset(args)
+    vocab, full_dataset = create_full_dataset(args)
 
     if args.test:
         test_dir = 'test'

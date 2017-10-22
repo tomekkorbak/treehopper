@@ -8,14 +8,9 @@ from vocab import build_vocab, Vocab
 
 
 def predict(models_filename):
-    train_dir = 'test'
-    vocab_file = 'tmp/vocab_test.txt'
-    build_vocab([
-        'test/polevaltest_sentence.txt',
-    ], 'tmp/vocab_test.txt')
-    vocab = Vocab(filename=vocab_file)
-    test_dataset = SSTDataset(train_dir, vocab, num_classes=3)
     args = sentiment.set_arguments({})
+    vocab = sentiment.create_full_dataset(args)[0]
+    test_dataset = SSTDataset('test', vocab, num_classes=3)
     trainer_instance = load_best_models([models_filename], args)[0]
     loss, accuracies, outputs, output_trees = trainer_instance.test(test_dataset)
     test_acc = torch.mean(accuracies)
@@ -36,7 +31,7 @@ def save_submission(predictions):
 
 acc =[]
 for i in range(0,25):
-    acc.append(predict('models/saved_model/models_20170903_1631/model_'+str(i)+'.pth'))
+    acc.append(predict('models/saved_model/models_20171022_2010/model_'+str(i)+'.pth'))
 print(str(acc))
 # save_submission(predictions)
 
