@@ -1,11 +1,11 @@
 from datetime import datetime
 
-import sentiment
 import torch
-from dataset import SSTDataset
-from ensemble import load_best_models
-from vocab import build_vocab, Vocab
 
+from src.data.dataset import SSTDataset
+from src.data.vocab import build_vocab, Vocab
+from src.evaluate.ensemble import load_best_models
+from src.evaluate import sentiment
 
 def predict(models_filename):
     train_dir = 'test'

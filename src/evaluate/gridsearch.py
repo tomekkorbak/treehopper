@@ -1,7 +1,8 @@
 from datetime import datetime
 
-import sentiment
 from sklearn.model_selection import ParameterGrid
+
+from src.evaluate import sentiment
 
 
 def grid_search():
@@ -9,7 +10,7 @@ def grid_search():
     param_grid["embeddings"] = [
         # ("data/pol/orth", "w2v_allwiki_nkjp300_300"),
         # ("data/pol/lemma", "w2v_allwiki_nkjp300_300"),
-        ("data/pol/fasttext", "wiki.pl")
+        ("data/pol/fasttext", "wiki.aa")
     ]
     # param_grid["optim"] = ["adam", "adagrad"]
     param_grid["wd"] = [0]
@@ -24,7 +25,7 @@ def grid_search():
     # param_grid['name'] = ['{date:%Y%m%d_%H%M}'.format(date=datetime.now())]
     grid = ParameterGrid(param_grid)
 
-    filename = "{date:%Y%m%d_%H%M}_results.csv".format(date=datetime.now())
+    filename = "results/{date:%Y%m%d_%H%M}_results.csv".format(date=datetime.now())
     print('Starting a grid search through {n} parameter combinations'.format(
         n=len(grid)))
     for params in grid:
