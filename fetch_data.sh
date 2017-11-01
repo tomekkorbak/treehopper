@@ -1,4 +1,12 @@
 #!/usr/bin/env bash
+
+echo "Creating directories"
+mkdir -p data/
+mkdir -p data/pol/
+mkdir -p models/
+mkdir -p results/
+mkdir tmp/
+
 echo "Download training set"
 curl -O http://poleval.pl/task2/sentiment-treebank.tar.gz
 tar -xvf sentiment-treebank.tar.gz
@@ -18,4 +26,15 @@ echo "Install Python requirements"
 pip install -r requirements.txt
 pip install http://download.pytorch.org/whl/cu80/torch-0.1.12.post2-cp35-cp35m-linux_x86_64.whl
 
-mkdir tmp/
+
+echo "Download test set"
+curl -O http://mozart.ipipan.waw.pl/~axw/poleval/poleval_test.tar.gz
+tar -xvf poleval_test.tar.gz
+mv poleval_test test
+rm poleval_test.tar.gz
+
+echo "Download test labels"
+curl -O http://mozart.ipipan.waw.pl/~axw/poleval/gold_labels
+cp gold_labels test/polevaltest_labels.txt
+rm gold_labels
+
