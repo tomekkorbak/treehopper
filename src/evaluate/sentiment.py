@@ -1,14 +1,14 @@
-import numpy as np
-from sklearn.model_selection import KFold
 import re
-import torch
 
-from split_datasets import split_dataset_simple, split_dataset_random, \
-    split_dataset_kfold
-from training import train
-from vocab import Vocab, build_vocab
-from dataset import SSTDataset
-from config import parse_args
+import numpy as np
+import torch
+from sklearn.model_selection import KFold
+from src.config import parse_args
+from src.datas.dataset import SSTDataset
+from src.datas.split_datasets import split_dataset_simple, split_dataset_random, split_dataset_kfold
+from src.datas.vocab import build_vocab, Vocab
+from src.model.training import train
+
 
 def set_arguments(grid_args):
     args = parse_args()
@@ -18,7 +18,7 @@ def set_arguments(grid_args):
             args.emb_file = grid_args["embeddings"][1]
         for key, val in grid_args.items():
             setattr(args,key,val)
-        args.calculate_new_words = True
+    args.calculate_new_words = True
 
     embedding_dim = "((\d+)d$)|((\d+)$)"
     dim_from_file = re.search(embedding_dim, args.emb_file)
@@ -28,7 +28,7 @@ def set_arguments(grid_args):
     args.cuda = args.cuda and torch.cuda.is_available()
 
     args.split = ('simple', 0.1) if args.folds == 1 else ('kfold', args.folds)
-    args.test = True #
+    args.test = False #
     #("simple",(dev_size,test_size)),("random",size_of_dev),("kfold", number_of_folds)
     print(args)
     return args

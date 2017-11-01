@@ -1,13 +1,12 @@
 import os
 import subprocess
-import numpy as np
 
+import numpy as np
 import torch
-from torch.nn import Embedding
 from gensim.models import KeyedVectors
 from gensim.models.wrappers import FastText
-
-from vocab import Vocab
+from src.datas.vocab import Vocab
+from torch.nn import Embedding
 
 
 def load_word_vectors(embeddings_path):
@@ -82,3 +81,4 @@ def load_embedding_model(args, vocab):
     # plug these into embedding matrix inside model
     embedding_model.state_dict()['weight'].copy_(emb)
     return embedding_model
+

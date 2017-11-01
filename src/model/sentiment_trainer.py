@@ -88,3 +88,4 @@ class SentimentTrainer(object):
             output, _, acc, tree = self.model(tree, emb)
             output_trees.append(tree)
         return output_trees
+

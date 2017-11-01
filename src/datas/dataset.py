@@ -1,13 +1,12 @@
 import os
 from copy import deepcopy
-from tqdm import tqdm
 
-from sklearn.utils import shuffle
 import torch
 import torch.utils.data as data
-
-from tree import Tree
-import constants
+from sklearn.utils import shuffle
+from src.datas import constants
+from src.model.tree import Tree
+from tqdm import tqdm
 
 
 class SSTDataset(data.Dataset):
@@ -46,9 +45,9 @@ class SSTDataset(data.Dataset):
                 self.labels.append(self.trees[i].gold_label)
 
                 # shuffle
-            self.trees, self.sentences, self.labels = shuffle(self.trees,
-                                                              self.sentences,
-                                                              self.labels)
+            # self.trees, self.sentences, self.labels = shuffle(self.trees,
+            #                                                   self.sentences,
+            #                                                   self.labels)
 
         self.labels = torch.Tensor(self.labels)  # let labels be tensor
 
@@ -150,3 +149,4 @@ class SSTDataset(data.Dataset):
         root._viz_relations = relations
         root._viz_labels = labels
         return root
+

@@ -85,3 +85,4 @@ class Vocab(object):
             if i == stop:
                 break
         return tokens
+

@@ -1,4 +1,12 @@
 #!/usr/bin/env bash
+
+echo "Creating directories"
+mkdir -p data/
+mkdir -p data/pol/
+mkdir -p models/
+mkdir -p results/
+mkdir tmp/
+
 echo "Download training set"
 curl -O http://poleval.pl/task2/sentiment-treebank.tar.gz
 tar -xvf sentiment-treebank.tar.gz
@@ -31,5 +39,3 @@ echo "Download test labels"
 curl -O http://mozart.ipipan.waw.pl/~axw/poleval/gold_labels
 cp gold_labels test/polevaltest_labels.txt
 rm gold_labels
-
-mkdir tmp/

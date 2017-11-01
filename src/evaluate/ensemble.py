@@ -1,18 +1,15 @@
 from datetime import datetime
 
-from sklearn.metrics import accuracy_score
-from torch import nn
-
-import sentiment
-from sklearn.model_selection import ParameterGrid
-
-from dataset import SSTDataset
-from sentiment_trainer import SentimentTrainer
-from split_datasets import split_dataset_simple
-from training import train, torch
-from vocab import Vocab, build_vocab
 import numpy as np
+from src.evaluate import sentiment
+from src.datas.dataset import SSTDataset
+from src.model.sentiment_trainer import SentimentTrainer
+from sklearn.model_selection import ParameterGrid
+from src.datas.split_datasets import split_dataset_simple
+from src.model.training import train, torch
+from src.datas.vocab import Vocab, build_vocab
 
+from torch import nn
 
 def test_ensemble(models, test_dataset):
     all_outputs = []

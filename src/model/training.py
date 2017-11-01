@@ -1,12 +1,14 @@
 from __future__ import print_function
 
-import torch.optim as optim
 import gc
 import os
 
-from model import *
-from sentiment_trainer import SentimentTrainer
-from embeddings import load_embedding_model
+import torch
+import torch.optim as optim
+from src.datas.embeddings import load_embedding_model
+from src.model.model import TreeLSTMSentiment
+from src.model.sentiment_trainer import SentimentTrainer
+from torch import nn
 
 
 def choose_optimizer(args, model):
@@ -64,4 +66,5 @@ def train(train_dataset, dev_dataset, vocab, args):
     print('epoch ' + str(max_dev_epoch) + ' dev score of ' + str(max_dev))
 
     return max_dev_epoch, max_dev, max_model_filename
+
 

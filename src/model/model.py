@@ -1,9 +1,8 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from src.model.zoneout import zoneout
 from torch.autograd import Variable as Var
-
-from zoneout import zoneout
 
 
 class ChildSumTreeLSTM(nn.Module):
@@ -147,3 +146,4 @@ class TreeLSTMSentiment(nn.Module):
     def forward(self, tree, inputs, training=False):
         _, loss = self.tree_module(tree, inputs, training)
         return tree.output, loss, tree.compute_accuracy(), tree
+

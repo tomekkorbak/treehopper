@@ -93,3 +93,4 @@ class Zoneout(InplaceFunction):
 
 def zoneout(current_input, previous_input, p=0.15, training=False, inplace=False, mask=None):
     return Zoneout(p, training, inplace, mask)(current_input, previous_input)
+

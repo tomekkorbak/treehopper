@@ -100,8 +100,8 @@ class Tree(object):
                         for tree in self.list_children_in_order())
 
     def get_output_as_string(self):
-        assert self.output, 'No predicted label'
-        return str(torch.max(self.output, 1)[1].data.cpu().numpy()[0][0]-1)
+        # assert self.output, 'No predicted label'
+        return str(torch.max(self.output, 1,keepdim=True)[1].data.cpu().numpy()[0][0] -1)
 
 
 def get_arcs(tree, arcs_list=None):
@@ -131,6 +131,7 @@ def get_label(tree, with_output=False):
     else:
         sentiment_label = str(tree.gold_label - 1)
     return sentiment_label
+
 
 
 
