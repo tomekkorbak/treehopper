@@ -14,7 +14,7 @@ def parse_args():
                             help='path to dataset')
         parser.add_argument('--emb_dir', default='resources/pol/fasttext/',
                             help='directory with embeddings')
-        parser.add_argument('--emb_file', default='wiki.aa',
+        parser.add_argument('--emb_file', default='wiki.pl',
                             help='file with embeddings')
         parser.add_argument('--batchsize', default=25, type=int,
                             help='batchsize for optimizer updates')
