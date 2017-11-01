@@ -1,7 +1,8 @@
 from datetime import datetime
 
 from sklearn.model_selection import ParameterGrid
-from src.evaluate import sentiment
+
+from treehopper.src.evaluate import sentiment
 
 
 def grid_search():

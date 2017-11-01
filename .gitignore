@@ -4,7 +4,7 @@ results*
 vocab.txt
 new_words.txt
 training-treebank/
-data/
+resources/
 models/
 .ipynb_checkpoints/
 .floydexpt

@@ -1,10 +1,11 @@
 from datetime import datetime
 
-import torch
-from src.datas.dataset import SSTDataset
-from src.datas.vocab import build_vocab, Vocab
-from src.evaluate import sentiment
-from src.evaluate.ensemble import load_best_models
+from treehopper.src.data.vocab import Vocab
+from treehopper.src.evaluate import sentiment
+from treehopper.src.evaluate.ensemble import load_best_models
+
+from treehopper.src.data.dataset import SSTDataset
+
 
 def predict(models_filename):
     args = sentiment.set_arguments({})

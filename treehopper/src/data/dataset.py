@@ -3,10 +3,10 @@ from copy import deepcopy
 
 import torch
 import torch.utils.data as data
-from sklearn.utils import shuffle
-from src.datas import constants
-from src.model.tree import Tree
+from treehopper.src.data import constants
 from tqdm import tqdm
+
+from treehopper.src.model.tree import Tree
 
 
 class SSTDataset(data.Dataset):

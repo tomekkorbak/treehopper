@@ -1,15 +1,16 @@
 from datetime import datetime
 
 import numpy as np
-from src.evaluate import sentiment
-from src.datas.dataset import SSTDataset
-from src.model.sentiment_trainer import SentimentTrainer
 from sklearn.model_selection import ParameterGrid
-from src.datas.split_datasets import split_dataset_simple
-from src.model.training import train, torch
-from src.datas.vocab import Vocab, build_vocab
-
+from treehopper.src.data.split_datasets import split_dataset_simple
+from treehopper.src.data.vocab import Vocab, build_vocab
+from treehopper.src.evaluate import sentiment
+from treehopper.src.model.sentiment_trainer import SentimentTrainer
+from treehopper.src.model.training import train, torch
 from torch import nn
+
+from treehopper.src.data.dataset import SSTDataset
+
 
 def test_ensemble(models, test_dataset):
     all_outputs = []

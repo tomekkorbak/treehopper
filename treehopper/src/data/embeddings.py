@@ -5,8 +5,9 @@ import numpy as np
 import torch
 from gensim.models import KeyedVectors
 from gensim.models.wrappers import FastText
-from src.datas.vocab import Vocab
 from torch.nn import Embedding
+
+from treehopper.src.data.vocab import Vocab
 
 
 def load_word_vectors(embeddings_path):

@@ -3,11 +3,12 @@ import re
 import numpy as np
 import torch
 from sklearn.model_selection import KFold
-from src.config import parse_args
-from src.datas.dataset import SSTDataset
-from src.datas.split_datasets import split_dataset_simple, split_dataset_random, split_dataset_kfold
-from src.datas.vocab import build_vocab, Vocab
-from src.model.training import train
+from treehopper.src.config import parse_args
+from treehopper.src.data.split_datasets import split_dataset_simple, split_dataset_random, split_dataset_kfold
+from treehopper.src.data.vocab import build_vocab, Vocab
+from treehopper.src.model.training import train
+
+from treehopper.src.data.dataset import SSTDataset
 
 
 def set_arguments(grid_args):

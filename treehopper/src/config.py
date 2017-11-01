@@ -12,9 +12,9 @@ def parse_args():
                             help='name for log and saved models')
         parser.add_argument('--data', default='training-treebank',
                             help='path to dataset')
-        parser.add_argument('--emb_dir', default='data/pol/orth/300',
+        parser.add_argument('--emb_dir', default='resources/pol/fasttext/',
                             help='directory with embeddings')
-        parser.add_argument('--emb_file', default='w2v_allwiki_nkjp300_300',
+        parser.add_argument('--emb_file', default='wiki.aa',
                             help='file with embeddings')
         parser.add_argument('--batchsize', default=25, type=int,
                             help='batchsize for optimizer updates')
