@@ -11,7 +11,7 @@ A dependency tree is a linguistic formalism used for described the structure of 
 
 Tree sentiment labeling is the task of labeling each phrase (subtree) of a parse tree with its sentiment. [Stanford Sentiment Treebank](https://nlp.stanford.edu/sentiment) is one famous dataset for this task, but using constituency trees as its underlying linguistic formalism of choice.
 
-Tree-LSTMs ([Tai et al., 2015](https://arxiv.org/abs/1503.00075)) generalizing LSTMs from chain-like to tree-like structures, enabling state-of-the-art tree sentiment labeling. treehopper implements a variant of Tree-LSTMs known as Child-Sum Tree-LSTMwhere each node of a tree can have an unbounded number of children and there is no order over those children. This approach is particularily well-suited for dependency trees.
+Tree-LSTMs ([Tai et al., 2015](https://arxiv.org/abs/1503.00075)) generalize LSTMs from chain-like to tree-like structures, enabling state-of-the-art tree sentiment labeling. treehopper implements a variant of Tree-LSTMs known as Child-Sum Tree-LSTMwhere each node of a tree can have an unbounded number of children and there is no order over those children. This approach is particularily well-suited for dependency trees.
 
 ## Citation
 
