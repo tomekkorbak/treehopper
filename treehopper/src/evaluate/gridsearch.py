@@ -10,7 +10,7 @@ def grid_search():
     param_grid["embeddings"] = [
         # ("data/pol/orth", "w2v_allwiki_nkjp300_300"),
         # ("data/pol/lemma", "w2v_allwiki_nkjp300_300"),
-        ("data/pol/fasttext", "wiki.aa")
+        ("resources/pol/fasttext", "wiki.aa")
     ]
     # param_grid["optim"] = ["adam", "adagrad"]
     param_grid["wd"] = [0]

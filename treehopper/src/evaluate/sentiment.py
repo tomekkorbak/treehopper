@@ -68,7 +68,7 @@ def main(grid_args = None):
                 dev_dataset,
                 split=args.split[1]
             )
-            max_dev_epoch, max_dev, _ = train(train_dataset, dev_dataset, vocab, args)
+            max_dev_epoch, max_dev, max_model_filename = train(train_dataset, dev_dataset, vocab, args)
         elif args.split[0] == "random":
             train_dataset, dev_dataset = split_dataset_random(
                 full_dataset,
@@ -76,7 +76,7 @@ def main(grid_args = None):
                 dev_dataset,
                 test_size=args.split[1]
             )
-            max_dev_epoch, max_dev, _ = train(train_dataset, dev_dataset, vocab, args)
+            max_dev_epoch, max_dev, max_model_filename = train(train_dataset, dev_dataset, vocab, args)
         else:
             all_dev_epoch, all_dev = kfold_training(
                 full_dataset,
@@ -93,13 +93,13 @@ def main(grid_args = None):
             epoch=max_dev_epoch,
             acc=max_dev
         ))
-    return max_dev_epoch, max_dev
+    return max_dev_epoch, max_dev, max_model_filename
 
 
 def kfold_training(dataset,vocab, split, train_dataset, dev_dataset,args):
     kf = KFold(n_splits=split)
     X = np.array([(x, y) for x, y in zip(dataset.trees, dataset.sentences)])
-    y = np.array(dataset.labels)
+    y = dataset.labels.numpy()
     max_dev_epoch, max_dev = [], []
     for train_index, test_index in kf.split(X):
         train_dataset, dev_dataset = split_dataset_kfold(X, y,

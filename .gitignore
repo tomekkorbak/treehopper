@@ -5,7 +5,7 @@ vocab.txt
 new_words.txt
 training-treebank/
 resources/
-models/
+models/saved_model
 .ipynb_checkpoints/
 .floydexpt
 .floydignore

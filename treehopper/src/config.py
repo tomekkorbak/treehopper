@@ -49,11 +49,15 @@ def parse_args():
                             help='Number of folds for k-fold cross validation '
                                  '(default: 1; this corresponds to simple '
                                  'validation).')
+        #Arguments necessary to determine what program should do
+        parser.add_argument('--train', dest='train', action='store_true', help='Train new model')
+        parser.add_argument('--predict', '-p', type=str, help='Tagging test file \'--predict output_file_path\' ')
+        parser.set_defaults()
 
         cuda_parser = parser.add_mutually_exclusive_group(required=False)
         cuda_parser.add_argument('--cuda', dest='cuda', action='store_true')
         cuda_parser.add_argument('--no-cuda', dest='cuda', action='store_false')
-        parser.set_defaults(cuda=False)
+        parser.set_defaults(cuda=False, train=False)
 
         args = parser.parse_args()
         return args
