@@ -6,6 +6,7 @@ new_words.txt
 training-treebank/
 resources/
 models/saved_model
+test/
 .ipynb_checkpoints/
 .floydexpt
 .floydignore
