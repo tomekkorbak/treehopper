@@ -1,13 +1,11 @@
 import argparse
 from datetime import datetime
-
 import re
-
 import torch
 
-
-def parse_args():
-        parser = argparse.ArgumentParser(description='PyTorch TreeLSTM for Sentiment Analysis Trees')
+def parse_args_train(parser = None):
+        if parser == None:
+            parser = argparse.ArgumentParser(description='PyTorch TreeLSTM for Sentiment Analysis Trees')
         parser.add_argument('--name',
                             default='{date:%Y%m%d_%H%M}'.format(
                                 date=datetime.now()),
@@ -62,8 +60,8 @@ def parse_args():
 
 
 
-def set_arguments(grid_args):
-    args = parse_args()
+def set_arguments(grid_args, parser = None):
+    args = parse_args_train(parser)
     if grid_args !=None:
         if "embeddings" in grid_args:
             args.emb_dir = grid_args["embeddings"][0]
