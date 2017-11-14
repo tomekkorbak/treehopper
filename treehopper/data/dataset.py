@@ -3,10 +3,10 @@ from copy import deepcopy
 
 import torch
 import torch.utils.data as data
-from treehopper.src.data import constants
 from tqdm import tqdm
+from treehopper.model.tree import Tree
 
-from treehopper.src.model.tree import Tree
+from treehopper.data import constants
 
 
 class SSTDataset(data.Dataset):

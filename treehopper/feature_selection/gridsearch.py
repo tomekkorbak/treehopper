@@ -2,7 +2,7 @@ from datetime import datetime
 
 from sklearn.model_selection import ParameterGrid
 
-from treehopper.src.evaluate import sentiment
+from treehopper import train
 
 
 def grid_search():
@@ -32,7 +32,7 @@ def grid_search():
         print(params)
         with open(filename, "a") as results_file:
             results_file.write(str(params) + ", ")
-            max_dev_epoch, max_dev = sentiment.main(params)
+            max_dev_epoch, max_dev = train.main(params)
             results_file.write('Epoch {epoch}, accuracy {acc:.4f}\n'.format(
                 epoch=max_dev_epoch,
                 acc=max_dev

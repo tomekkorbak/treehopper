@@ -1,6 +1,10 @@
 import argparse
 from datetime import datetime
 
+import re
+
+import torch
+
 
 def parse_args():
         parser = argparse.ArgumentParser(description='PyTorch TreeLSTM for Sentiment Analysis Trees')
@@ -45,14 +49,8 @@ def parse_args():
         parser.add_argument('--reweight', default=False, type=bool,
                             help='reweight loss per class to the distrubition '
                                  'of classess in the public dataset')
-        parser.add_argument('--folds', default=1, type=int,
-                            help='Number of folds for k-fold cross validation '
-                                 '(default: 1; this corresponds to simple '
-                                 'validation).')
-        #Arguments necessary to determine what program should do
-        parser.add_argument('--train', dest='train', action='store_true', help='Train new model')
-        parser.add_argument('--predict', '-p', type=str, help='Tagging test file \'--predict output_file_path\' ')
-        parser.set_defaults()
+        parser.add_argument('--split', default=0.1, type=float,
+                            help='Train/val split size')
 
         cuda_parser = parser.add_mutually_exclusive_group(required=False)
         cuda_parser.add_argument('--cuda', dest='cuda', action='store_true')
@@ -61,3 +59,26 @@ def parse_args():
 
         args = parser.parse_args()
         return args
+
+
+
+def set_arguments(grid_args):
+    args = parse_args()
+    if grid_args !=None:
+        if "embeddings" in grid_args:
+            args.emb_dir = grid_args["embeddings"][0]
+            args.emb_file = grid_args["embeddings"][1]
+        for key, val in grid_args.items():
+            setattr(args,key,val)
+    args.calculate_new_words = True
+
+    embedding_dim = "((\d+)d$)|((\d+)$)"
+    dim_from_file = re.search(embedding_dim, args.emb_file)
+    args.input_dim = int(dim_from_file.group(0)) if dim_from_file else 300
+    args.num_classes = 3  # -1 0 1
+
+    args.cuda = args.cuda and torch.cuda.is_available()
+
+    args.test = False #
+    print(args)
+    return args
