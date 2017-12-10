@@ -1,11 +1,11 @@
 import argparse
-
 import torch
-from data.vocab import Vocab
-from predict import load_best_model
 
+import train
+
+from predict import load_best_model
 from data.dataset import SSTDataset
-from treehopper import train
+
 
 
 def eval(args):

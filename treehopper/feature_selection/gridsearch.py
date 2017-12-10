@@ -2,7 +2,7 @@ from datetime import datetime
 
 from sklearn.model_selection import ParameterGrid
 
-from treehopper import train
+import train
 
 
 def grid_search():

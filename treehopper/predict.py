@@ -7,7 +7,7 @@ from data.vocab import Vocab
 from model.sentiment_trainer import SentimentTrainer
 
 from data.dataset import SSTDataset
-from treehopper import train
+import train
 
 def predict(args):
     trainer_instance = load_best_model(args.model_path, args)
