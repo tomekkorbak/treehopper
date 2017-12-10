@@ -8,11 +8,14 @@ class SentimentTrainer(object):
     """
     For Sentiment module
     """
-    def __init__(self, args, model, criterion, optimizer):
+    def __init__(self, args, model, criterion, optimizer, embedding_model = None):
         super(SentimentTrainer, self).__init__()
         self.args       = args
         self.model      = model
-        self.embedding_model = self.model.embeddings
+        if embedding_model:
+            self.embedding_model = embedding_model
+        else:
+            self.embedding_model = self.model.embeddings
         self.criterion  = criterion
         self.optimizer  = optimizer
         self.epoch      = 0
