@@ -9,7 +9,6 @@ from treehopper import train
 
 
 def eval(args):
-    vocab = train.create_full_dataset(args)[0]
     test_dataset = SSTDataset(args.input, Vocab(filename=args.vocab), num_classes=3)
     trainer_instance = load_best_model(args.model_path, args)
     loss, accuracies, outputs, output_trees = trainer_instance.test(test_dataset)

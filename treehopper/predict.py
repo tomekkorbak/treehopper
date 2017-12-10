@@ -26,9 +26,7 @@ def save_submission(predictions, filename):
 
 def load_best_model(model_filename, args):
     model = torch.load(model_filename)
-    emb = torch.load(model_filename.replace("model_", "embedding_"))
-    trainer = SentimentTrainer(args, model, emb,
-                               criterion=nn.NLLLoss(), optimizer=None)
+    trainer = SentimentTrainer(args, model,criterion=nn.NLLLoss(), optimizer=None)
     return trainer
 
 

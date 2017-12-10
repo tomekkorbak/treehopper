@@ -138,11 +138,12 @@ class SentimentModule(nn.Module):
 
 
 class TreeLSTMSentiment(nn.Module):
-    def __init__(self, args, criterion):
+    def __init__(self, args, criterion, embeddings):
         super(TreeLSTMSentiment, self).__init__()
         self.output_module = SentimentModule(args, dropout=0.5)
         self.tree_module = ChildSumTreeLSTM(args, criterion,
                                             output_module=self.output_module)
+        self.embeddings = embeddings
 
     def forward(self, tree, inputs, training=False):
         _, loss = self.tree_module(tree, inputs, training)
