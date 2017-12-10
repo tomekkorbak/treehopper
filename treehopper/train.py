@@ -3,12 +3,12 @@ import re
 import numpy as np
 import torch
 from sklearn.model_selection import KFold
-from treehopper.config import set_arguments
-from treehopper.data.split_datasets import split_dataset_kfold, split_dataset_simple
-from treehopper.data.vocab import build_vocab, Vocab
-from treehopper.model.training import train
+from config import set_arguments
+from data.split_datasets import split_dataset_kfold, split_dataset_simple
+from data.vocab import build_vocab, Vocab
+from model.training import train
 
-from treehopper.data.dataset import SSTDataset
+from data.dataset import SSTDataset
 
 
 

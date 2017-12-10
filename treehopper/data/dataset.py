@@ -4,9 +4,9 @@ from copy import deepcopy
 import torch
 import torch.utils.data as data
 from tqdm import tqdm
-from treehopper.model.tree import Tree
+from model.tree import Tree
 
-from treehopper.data import constants
+from data import constants
 
 
 class SSTDataset(data.Dataset):

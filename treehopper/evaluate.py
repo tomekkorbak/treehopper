@@ -1,10 +1,10 @@
 import argparse
 
 import torch
-from treehopper.data.vocab import Vocab
-from treehopper.predict import load_best_model
+from data.vocab import Vocab
+from predict import load_best_model
 
-from treehopper.data.dataset import SSTDataset
+from data.dataset import SSTDataset
 from treehopper import train
 
 

@@ -3,10 +3,10 @@ from datetime import datetime
 
 import torch
 from torch import nn
-from treehopper.data.vocab import Vocab
-from treehopper.model.sentiment_trainer import SentimentTrainer
+from data.vocab import Vocab
+from model.sentiment_trainer import SentimentTrainer
 
-from treehopper.data.dataset import SSTDataset
+from data.dataset import SSTDataset
 from treehopper import train
 
 def predict(args):

@@ -6,10 +6,10 @@ import os
 import torch
 import torch.optim as optim
 from torch import nn
-from treehopper.model.model import TreeLSTMSentiment
-from treehopper.model.sentiment_trainer import SentimentTrainer
+from model.model import TreeLSTMSentiment
+from model.sentiment_trainer import SentimentTrainer
 
-from treehopper.data.embeddings import load_embedding_model
+from data.embeddings import load_embedding_model
 
 
 def choose_optimizer(args, model):

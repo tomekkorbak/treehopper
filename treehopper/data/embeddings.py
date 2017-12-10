@@ -7,7 +7,7 @@ from gensim.models import KeyedVectors
 from gensim.models.wrappers import FastText
 from torch.nn import Embedding
 
-from treehopper.data.vocab import Vocab
+from data.vocab import Vocab
 
 
 def load_word_vectors(embeddings_path):

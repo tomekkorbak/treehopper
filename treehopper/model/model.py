@@ -3,7 +3,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.autograd import Variable as Var
 
-from treehopper.model.zoneout import zoneout
+from model.zoneout import zoneout
 
 
 class ChildSumTreeLSTM(nn.Module):
