@@ -1,5 +1,7 @@
 import os
 
+from gensim.models.wrappers import FastText
+
 
 def build_vocab(filenames, vocabfile):
     """Write unique words from a set of files to a new file"""
@@ -8,10 +10,14 @@ def build_vocab(filenames, vocabfile):
         return
     vocab = set()
     for filename in filenames:
-        with open(filename, 'r', encoding='utf-8') as f:
-            for line in f:
-                tokens = line.rstrip('\n').lower().split()
-                vocab |= set(tokens)
+        if filename.endswith('.vec'):
+            model = FastText.load_word2vec_format(filename)
+            vocab |= set(model.vocab.keys())
+        else:
+            with open(filename, 'r', encoding='utf-8') as f:
+                for line in f:
+                    tokens = line.rstrip('\n').lower().split()
+                    vocab |= set(tokens)
     with open(vocabfile, 'w', encoding='utf-8') as f:
         for token in vocab:
             f.write(token + '\n')

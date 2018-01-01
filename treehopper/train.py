@@ -19,7 +19,7 @@ def create_full_dataset(args):
         'training-treebank/rev_sentence.txt',
         'training-treebank/sklad_sentence.txt',
         'test/polevaltest_sentence.txt',
-        args.emb_dir+args.emb_file+'.vocab'
+        args.emb_dir+args.emb_file+'.vec' #full vocabulary in model
     ], 'tmp/vocab.txt')
     vocab = Vocab(filename=vocab_file)
     full_dataset = SSTDataset(train_dir, vocab, args.num_classes)
