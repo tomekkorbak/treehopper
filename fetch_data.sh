@@ -8,7 +8,6 @@ curl -O http://poleval.pl/task2/sentiment-treebank.tar.gz
 tar -xvf sentiment-treebank.tar.gz
 rm sentiment-treebank.tar.gz
 
-
 echo "Download fastText word vectors for Polish"
 curl -O https://s3-us-west-1.amazonaws.com/fasttext-vectors/wiki.pl.zip
 mkdir -p data/pol/fasttext
