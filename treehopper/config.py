@@ -20,7 +20,7 @@ def parse_args_train(parser = None):
                             help='file with embeddings')
         parser.add_argument('--batchsize', default=25, type=int,
                             help='batchsize for optimizer updates')
-        parser.add_argument('--epochs', default=25, type=int,
+        parser.add_argument('--epochs', default=5, type=int,
                             help='number of total epochs to run')
         parser.add_argument('--mem_dim', default=300, type=int,
                             help='size of LSTM hidden state')
@@ -49,6 +49,9 @@ def parse_args_train(parser = None):
                                  'of classess in the public dataset')
         parser.add_argument('--split', default=0.1, type=float,
                             help='Train/val split size')
+        parser.add_argument('--use_full_training_set', default=True,
+                            help='Train of full PolEval training set, '
+                                 'i.e. train+dev')
 
         cuda_parser = parser.add_mutually_exclusive_group(required=False)
         cuda_parser.add_argument('--cuda', dest='cuda', action='store_true')
@@ -77,6 +80,6 @@ def set_arguments(grid_args, parser = None):
 
     args.cuda = args.cuda and torch.cuda.is_available()
 
-    args.test = False #
+    args.test = args.use_full_training_set
     print(args)
     return args

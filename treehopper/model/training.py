@@ -17,7 +17,6 @@ def choose_optimizer(args, model):
     if args.optim =='adam':
         return optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=args.lr, weight_decay=args.wd)
     elif args.optim=='adagrad':
-        # optimizer   = optim.Adagrad(filter(lambda p: p.requires_grad, model.parameters()), lr=args.lr, weight_decay=args.wd)
         return optim.Adagrad([
                 {'params': model.parameters(), 'lr': args.lr}
             ], lr=args.lr, weight_decay=args.wd)
@@ -40,8 +39,6 @@ def train(train_dataset, dev_dataset, vocab, args):
 
     optimizer = choose_optimizer(args,model)
 
-
-
     # create trainer object for training and testing
     trainer = SentimentTrainer(args, model ,criterion, optimizer, embedding_model)
     experiment_dir = os.path.join(os.getcwd(), args.saved, "models_" + args.name)
@@ -52,10 +49,11 @@ def train(train_dataset, dev_dataset, vocab, args):
     max_dev_epoch = 0
     for epoch in range(args.epochs):
         train_loss = trainer.train(train_dataset)
-        dev_loss, dev_acc, _, _ = trainer.test(dev_dataset)
-        dev_acc = torch.mean(dev_acc)
-        print('==> Train loss   : %f \t' % train_loss, end="")
-        print('Epoch ', epoch, 'dev percentage ', dev_acc)
+        if args.use_full_training_set:
+            dev_loss, dev_acc, _, _ = trainer.test(dev_dataset)
+            dev_acc = torch.mean(dev_acc)
+            print('==> Train loss   : %f \t' % train_loss, end="")
+            print('Epoch ', epoch, 'dev percentage ', dev_acc)
         model_filename = experiment_dir + '/' +'model_' + str(epoch) + '.pth'
         torch.save(model, model_filename)
         if dev_acc > max_dev:

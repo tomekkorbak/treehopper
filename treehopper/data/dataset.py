@@ -51,6 +51,23 @@ class SSTDataset(data.Dataset):
 
         self.labels = torch.Tensor(self.labels)  # let labels be tensor
 
+    @classmethod
+    def create_dataset_from_user_input(cls, sentence_path, parents_path,
+                                       vocab=None, num_classes=None):
+        dataset = cls()
+        dataset.vocab = vocab
+        dataset.num_classes = num_classes
+        parents_file = open(parents_path, 'r', encoding='utf-8')
+        tokens_file = open(sentence_path, 'r', encoding='utf-8')
+        dataset.trees = [
+            dataset.read_tree(parents, 0, tokens, tokens)
+            for parents, tokens in zip(parents_file.readlines(),
+                                       tokens_file.readlines())
+        ]
+        dataset.sentences = dataset.read_sentences(sentence_path)
+        dataset.labels = torch.Tensor(len(dataset.sentences))
+        return dataset
+
     def __len__(self):
         return len(self.trees)
 

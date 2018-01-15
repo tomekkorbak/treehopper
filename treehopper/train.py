@@ -35,7 +35,6 @@ def main(grid_args = None):
         test_dataset = SSTDataset(test_dir, vocab, args.num_classes)
         max_dev_epoch, max_dev_acc, max_model_filename = train(full_dataset, test_dataset, vocab, args)
     else:
-
         train_dataset = SSTDataset(num_classes=args.num_classes)
         dev_dataset   = SSTDataset(num_classes=args.num_classes)
 
