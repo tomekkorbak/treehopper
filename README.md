@@ -44,23 +44,23 @@ python predict --model_path model.pth \
 
 ### Evaluating a pre-trained model
 
-By default, evaluation is against PolEval evaluation dataset.
-
 ```bash
 cd treehopper/
 ./fetch_data.sh
 python evaluate.py --model_path model.pth
 ```
 
-### Training from scratch
+By default, evaluation is against PolEval evaluation dataset.
 
-By default, models trained are saved per epoch in `/models/saved_models/`.
+### Training from scratch
 
 ```bash
 cd treehopper/
 ./fetch_data.sh
 python train.py
 ```
+
+By default, models trained are saved per epoch in `/models/saved_models/`.
 
 ### Documentation
 
@@ -70,7 +70,7 @@ All flags default to hyperparameters described in the paper.
 
 ## Authors
 
-Tomasz Korbak (tomasz.korbak@gmail.com)
+Tomasz Korbak (tomasz.korbak@gmail.com)  
 Paulina Żak (paulina.zak1@gmail.com)
 
 ## How to cite
