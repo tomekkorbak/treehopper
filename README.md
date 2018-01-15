@@ -45,8 +45,8 @@ python predict --model_path model.pth \
 ### Evaluating a pre-trained model
 
 ```bash
-cd treehopper/
 ./fetch_data.sh
+cd treehopper/
 python evaluate.py --model_path model.pth
 ```
 
@@ -55,8 +55,8 @@ By default, evaluation is against PolEval evaluation dataset.
 ### Training from scratch
 
 ```bash
-cd treehopper/
 ./fetch_data.sh
+cd treehopper/
 python train.py
 ```
 
