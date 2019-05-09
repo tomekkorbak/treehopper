@@ -4,7 +4,7 @@ echo "Creating directories"
 mkdir -p data/pol/ models/ results/ finals/ treehopper/tmp/
 
 echo "Download training set"
-curl -O http://poleval.pl/task2/sentiment-treebank.tar.gz
+curl -O http://2017.poleval.pl/task2/sentiment-treebank.tar.gz
 tar -xvf sentiment-treebank.tar.gz
 rm sentiment-treebank.tar.gz
 
